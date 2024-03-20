@@ -1,15 +1,25 @@
 import { Row, Col } from "react-bootstrap";
 import Product from "../Components/Product";
-import products from "../products";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 const HomeScreen = () => {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const { data } = await axios.get("/api/products");
+      setProducts(data);
+    };
+    fetchProducts();
+  }, []);
   return (
     <>
       <h1>Latest products</h1>
       <Row>
         {products.map((product) => (
           <Col key={product._id} sm={12} md={6} lg={4} xl={3}>
-            {/* afisare numar de elemente in functie de dimensiunea ecranului */}
+            {/* show the number of elements reffering to the screen size */}
             <Product product={product} />
           </Col>
         ))}
