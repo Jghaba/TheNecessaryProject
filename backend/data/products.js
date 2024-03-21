@@ -1,6 +1,5 @@
 const products = [
   {
-    _id: "1",
     name: "Airpods Wireless cra cra cra cra cra cra cra",
     image: "/images/airpods.jpg",
     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
@@ -12,7 +11,6 @@ const products = [
     numReviews: 12,
   },
   {
-    _id: "2",
     name: "Smartphone XYZ",
     image: "/images/phone.jpg",
     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
@@ -24,7 +22,6 @@ const products = [
     numReviews: 8,
   },
   {
-    _id: "3",
     name: "Alexa ABC",
     image: "/images/alexa.jpg",
     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
@@ -36,7 +33,6 @@ const products = [
     numReviews: 10,
   },
   {
-    _id: "4",
     name: "Playstation DEF",
     image: "/images/playstation.jpg",
     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
@@ -48,7 +44,6 @@ const products = [
     numReviews: 20,
   },
   {
-    _id: "5",
     name: "Mouse",
     image: "/images/Mouse.jpg",
     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
@@ -60,7 +55,6 @@ const products = [
     numReviews: 5,
   },
   {
-    _id: "6",
     name: "Camera JKL",
     image: "/images/camera.jpg",
     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
