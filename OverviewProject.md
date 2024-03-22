@@ -15,3 +15,11 @@
 # 2. npm run server --> runs backend server
 
 # 3. npm run dev --> runs both frontend and backend servers using "concurrently"
+
+# ------------------------------------------------------------------------------------------------------
+
+# Data import/export to MongoDB Compass functionalities
+
+# 1. npm run data:import --> imports data to mongoDB
+
+# 2. npm run data:destroy --> destroys data from mongoDB
