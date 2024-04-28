@@ -7,7 +7,6 @@ const orderSchema = mongoose.Schema(
       required: true,
       ref: "User",
     },
-    //array of multiple order items
     orderItems: [
       {
         name: { type: String, required: true },
@@ -37,11 +36,6 @@ const orderSchema = mongoose.Schema(
       update_time: { type: String },
       email_address: { type: String },
     },
-    itemsPrice: {
-      type: Number,
-      required: true,
-      default: 0.0,
-    },
     taxPrice: {
       type: Number,
       required: true,
@@ -60,7 +54,7 @@ const orderSchema = mongoose.Schema(
     isPaid: {
       type: Boolean,
       required: true,
-      default: 0.0,
+      default: false,
     },
     paidAt: {
       type: Date,
