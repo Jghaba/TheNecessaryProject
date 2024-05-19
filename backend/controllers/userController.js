@@ -120,6 +120,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 // @route   GET /api/users
 // @acces   Private/ADMIN
 const getUsers = asyncHandler(async (req, res) => {
+  const pageSize = 12;
   const users = await User.find({});
   res.status(200).json(users);
 });
