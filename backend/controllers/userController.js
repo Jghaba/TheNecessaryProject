@@ -171,7 +171,9 @@ const updateUser = asyncHandler(async (req, res) => {
   if (user) {
     user.name = req.body.name || user.name;
     user.email = req.body.email || user.emal;
-    user.isAdmin = Boolean(req.body.isAdmin);
+    if (req.user.isAdmin && user._id.toString() !== req.user._id.toString()) {
+      user.isAdmin = Boolean(req.body.isAdmin);
+    }
 
     const updatedUser = await user.save();
 

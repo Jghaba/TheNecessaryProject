@@ -1,6 +1,6 @@
 import { LinkContainer } from "react-router-bootstrap";
 import { Table, Button, Row, Col } from "react-bootstrap";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import { useParams } from "react-router-dom";
 import Message from "../../Components/Message";
 import Loader from "../../Components/Loader";
@@ -56,7 +56,7 @@ const ProductListScreen = () => {
         </Col>
         <Col className="text-end">
           <Button className="btn-sm m-3" onClick={createProductHandler}>
-            <FaEdit /> Create Product
+            <FaPlus /> Create Product
           </Button>
         </Col>
       </Row>
@@ -65,7 +65,7 @@ const ProductListScreen = () => {
       {isLoading ? (
         <Loader />
       ) : error ? (
-        <Message variant="danger">{error}</Message>
+        <Message variant="danger">{error.data.message}</Message>
       ) : (
         <>
           <Table striped hover responsive className="table-sm">
