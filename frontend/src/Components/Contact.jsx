@@ -1,6 +1,5 @@
 import React from "react";
 import { Row, Col } from "react-bootstrap";
-import { FaMapMarkerAlt } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 const Contact = () => {

@@ -1,0 +1,26 @@
+version: "3.4"
+
+services:
+  # NODEJS
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app
+    ports:
+      - "3000:3000"
+      - "5000:5000"
+    tty: true
+    volumes:
+      - "./:/var/www/app:rw"
+    restart: unless-stopped
+
+  mongo:
+    image: "mongo:3.4.1"
+    ports:
+      - "27017:27017"
+    volumes:
+      - "mongo:/data/db"
+
+volumes:
+  mongo:
