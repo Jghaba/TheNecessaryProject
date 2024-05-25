@@ -7,11 +7,11 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
   const location = useLocation();
 
-  // Verificăm dacă utilizatorul se află pe paginile de autentificare sau înregistrare
+  // verify if the user is on the login/auth pages
   const isAuthPage =
     location.pathname === "/login" || location.pathname === "/register";
 
-  // Dacă suntem pe o pagină de autentificare sau înregistrare, nu afișăm footer-ul
+  //block if positive
   if (isAuthPage) {
     return null;
   }
