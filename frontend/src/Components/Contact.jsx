@@ -12,7 +12,7 @@ const Contact = () => {
         <h1>Contact Us</h1>
         <Row>
           <Col md={6}>
-            <h2>Our Location</h2>
+            <h2>Our Details</h2>
             <p>
               <strong>Address:</strong> ParkLake Mall, Șoseaua Liviu Rebreanu
               nr. 4, Sector 3, București, România
