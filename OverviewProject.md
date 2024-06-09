@@ -23,3 +23,7 @@
 # 1. npm run data:import --> imports data to mongoDB
 
 # 2. npm run data:destroy --> destroys data from mongoDB
+
+# ------------------------------------------------------------------------------------------------------
+
+# 1. docker compose up -d --build -> build the Docker Containers
