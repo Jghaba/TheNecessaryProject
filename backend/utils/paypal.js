@@ -3,7 +3,7 @@ dotenv.config();
 const { PAYPAL_CLIENT_ID, PAYPAL_APP_SECRET, PAYPAL_API_URL } = process.env;
 
 /**
- * Fetches an access token from the PayPal API.
+ *Fetches an access token from the PayPal API.
  * @see {@link https://developer.paypal.com/reference/get-an-access-token/#link-getanaccesstoken}
  *
  * @returns {Promise<string>} The access token if the request is successful.
