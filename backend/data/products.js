@@ -30,7 +30,7 @@ const products = [
     brand: "TheNecessary",
     category: "Pants",
     price: "39.99",
-    countInStock: 10,
+    countInStock: 15,
     rating: 0,
     numReviews: 0,
   },
