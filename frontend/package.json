@@ -24,6 +24,7 @@
     "react-scripts": "5.0.1",
     "react-toastify": "^10.0.5",
     "spawn-command": "^0.0.2-1",
+    "thenecessary": "file:..",
     "util": "^0.12.5",
     "web-vitals": "^2.1.4"
   },

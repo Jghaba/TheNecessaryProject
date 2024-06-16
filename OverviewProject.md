@@ -16,6 +16,8 @@
 
 # 3. npm run dev --> runs both frontend and backend servers using "concurrently"
 
+# 4. npm run build --> builds into frontend folder - preparation for prod
+
 # ------------------------------------------------------------------------------------------------------
 
 # Data import/export to MongoDB Compass functionalities
