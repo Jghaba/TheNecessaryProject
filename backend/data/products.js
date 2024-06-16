@@ -25,7 +25,7 @@ const products = [
   },
   {
     name: "Necessary Sweatpants",
-    image: "/images/sweatpants.PNG",
+    image: "/images/sweatPants.PNG",
     description: "Comfortable and versatile sweatpants for a laid-back look.",
     brand: "TheNecessary",
     category: "Pants",
