@@ -28,4 +28,4 @@
 
 # ------------------------------------------------------------------------------------------------------
 
-# 1. docker compose up -d --build -> build the Docker Containers
+# 1. docker compose up -d --build -> build the Docker Containers -> test mode at this point
