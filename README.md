@@ -45,6 +45,7 @@ Referințe	20
 
  
 Link video | Prezentare proiect | Demo aplicație
+https://youtu.be/aaK064xkrr4
 
 URL proiect | Vizitare aplicatie
 [Welcome to TheNecessary](https://thenecessaryproject.onrender.com/)
