@@ -70,6 +70,22 @@ export async function checkIfNewTransaction(orderModel, paypalTransactionId) {
  * @throws {Error} If the request is not successful.
  *
  */
+export async function capturePayPalOrder(paypalOrderId) {
+  const accessToken = await getPayPalAccessToken();
+  const response = await fetch(
+    `${PAYPAL_API_URL}/v2/checkout/orders/${paypalOrderId}/capture`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
+  if (!response.ok) throw new Error("Failed to capture payment");
+  return response.json();
+}
+
 export async function verifyPayPalPayment(paypalTransactionId) {
   const accessToken = await getPayPalAccessToken();
   const paypalResponse = await fetch(

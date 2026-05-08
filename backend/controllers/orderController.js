@@ -2,7 +2,7 @@ import asyncHandler from "../middleware/asyncHandler.js";
 import Order from "../models/OderModel.js";
 import Product from "../models/ProductModel.js";
 import { calcPrices } from "../utils/calcPrices.js";
-import { checkIfNewTransaction, verifyPayPalPayment } from "../utils/paypal.js";
+import { checkIfNewTransaction, capturePayPalOrder } from "../utils/paypal.js";
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -96,31 +96,31 @@ const getOrderById = asyncHandler(async (req, res) => {
 // @route   PUT /api/orders/:id/pay
 // @acces   Private
 const updateOrderToPaid = asyncHandler(async (req, res) => {
-  const { verified, value } = await verifyPayPalPayment(req.body.id);
-  if (!verified) throw new Error("Payment not verified");
+  const captureData = await capturePayPalOrder(req.body.id);
 
-  //check if the transaction has been used before
-  const isNewTransaction = await checkIfNewTransaction(Order, req.body.id);
+  if (captureData.status !== "COMPLETED") throw new Error("Payment not captured");
+
+  const isNewTransaction = await checkIfNewTransaction(Order, captureData.id);
   if (!isNewTransaction) throw new Error("Transaction has been used before");
 
   const order = await Order.findById(req.params.id);
 
   if (order) {
-    //check if the correct amount was paid
-    const paidCorrectAmount = order.totalPrice.toString() === value;
+    const capturedAmount =
+      captureData.purchase_units[0].payments.captures[0].amount.value;
+    const paidCorrectAmount = order.totalPrice.toString() === capturedAmount;
     if (!paidCorrectAmount) throw new Error("Incorrect amount paid");
 
     order.isPaid = true;
     order.paidAt = Date.now();
     order.paymentResult = {
-      id: req.body.id,
-      status: req.body.status,
-      update_time: req.body.update_time,
-      email_address: req.body.payer.email_address,
+      id: captureData.id,
+      status: captureData.status,
+      update_time: captureData.update_time,
+      email_address: captureData.payer.email_address,
     };
 
     const updatedOrder = await order.save();
-
     res.json(updatedOrder);
   } else {
     res.status(404);

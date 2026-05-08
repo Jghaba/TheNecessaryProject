@@ -45,7 +45,7 @@ const OrderScreen = () => {
           type: "resetOptions",
           value: {
             "client-id": paypal.clientId,
-            currency: "USD",
+            currency: "EUR",
           },
         });
         paypalDispatch({ type: "setLoadingStatus", value: "pending" });
@@ -58,16 +58,14 @@ const OrderScreen = () => {
     }
   }, [order, paypal, paypalDispatch, loadingPayPal, errorPayPal]);
 
-  function onApprove(data, actions) {
-    return actions.order.capture().then(async function (details) {
-      try {
-        await payOrder({ orderId, details }).unwrap();
-        refetch();
-        toast.success("Payment successful");
-      } catch (err) {
-        toast.error(err?.data?.message || err.message);
-      }
-    });
+  async function onApprove(data, actions) {
+    try {
+      await payOrder({ orderId, details: { id: data.orderID } }).unwrap();
+      refetch();
+      toast.success("Payment successful");
+    } catch (err) {
+      toast.error(err?.data?.message || err.message);
+    }
   }
 
   function onError(err) {
@@ -80,7 +78,7 @@ const OrderScreen = () => {
         purchase_units: [
           {
             amount: {
-              value: order.totalPrice,
+              value: Number(order.totalPrice).toFixed(2), // Forțează formatul 0.00
             },
           },
         ],
@@ -239,3 +237,4 @@ const OrderScreen = () => {
 };
 
 export default OrderScreen;
+
