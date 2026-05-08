@@ -1,48 +1,47 @@
 import mongoose from "mongoose";
+import crypto from "crypto";
 
 const analyticsSchema = mongoose.Schema(
   {
-    // Sursa traficului: TikTok, Instagram, etc.
+    campaignId: {
+      type: String,
+      unique: true,
+      default: () => crypto.randomUUID(),
+    },
     source: {
       type: String,
       required: true,
       enum: ["TikTok", "Instagram", "Facebook", "YouTube"],
     },
-    // Referința către postarea specifică (URL-ul clipului generat cu AI)
-    postId: {
+    niche: {
       type: String,
       required: true,
     },
-    // Stilul de conținut identificat de scraper (ex: 'ASMR', 'Street Interview', 'Unboxing')
     contentStyle: {
       type: String,
       required: true,
     },
-    // Produsul promovat în acel clip
+    postId: {
+      type: String,
+    },
     product: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "Product",
     },
-    // Indicatori de Performanță (KPIs)
-    clicks: {
-      type: Number,
-      required: true,
-      default: 0,
-    },
-    conversions: {
-      type: Number,
-      required: true,
-      default: 0, // Câte comenzi au fost plasate
-    },
-    totalRevenue: {
-      type: Number,
-      required: true,
-      default: 0.0, // Câți bani a adus postarea respectivă
-    },
+    clicks: { type: Number, default: 0 },
+    conversions: { type: Number, default: 0 },
+    totalRevenue: { type: Number, default: 0 },
+
+    // Instagram Graph API fields — populated by scraper
+    views: { type: Number, default: 0 },
+    likes: { type: Number, default: 0 },
+    shares: { type: Number, default: 0 },
+    saved: { type: Number, default: 0 },
+    commentCount: { type: Number, default: 0 },
   },
   {
-    timestamps: true, // Ne va permite să vedem evoluția în timp (ex: vânzări pe martie vs aprilie)
+    timestamps: true,
   }
 );
 

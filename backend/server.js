@@ -10,6 +10,7 @@ import userRoutes from "./routes/userRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import analyticsRoutes from './routes/analyticsRoutes.js';
+import './cron/syncInstagramMetrics.js';
 const port = process.env.PORT || 5000;
 
 connectDB(); //connect to MongoDB

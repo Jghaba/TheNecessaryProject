@@ -1,17 +1,21 @@
 import express from "express";
-const router = express.Router();
 import {
   createSocialPostRecord,
   registerClick,
+  registerConversion,
   getAnalyticsSummary,
+  triggerInstagramSync,
 } from "../controllers/analyticsController.js";
 import { protect, admin } from "../middleware/authMiddleware.js";
 
-router
-  .route("/")
-  .post(protect, admin, createSocialPostRecord)
-  .get(protect, admin, getAnalyticsSummary);
+const router = express.Router();
 
-router.route("/:id/click").put(registerClick);
+router.route("/").get(protect, admin, getAnalyticsSummary).post(protect, admin, createSocialPostRecord);
+
+router.route("/sync").post(protect, admin, triggerInstagramSync);
+
+router.route("/:campaignId/click").put(registerClick);
+
+router.route("/:campaignId/convert").put(protect, registerConversion);
 
 export default router;
