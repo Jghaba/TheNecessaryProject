@@ -1,3 +1,4 @@
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import asyncHandler from "../middleware/asyncHandler.js";
 import Analytics from "../models/AnalyticsModel.js";
 import SiteMetrics from "../models/SiteMetricsModel.js";
@@ -142,8 +143,60 @@ const triggerInstagramSync = asyncHandler(async (req, res) => {
   res.json({ message: "Sync complete", ...result });
 });
 
+// @desc    Link an Instagram post URL to a campaign
+// @route   PUT /api/analytics/:campaignId/post
+// @access  Private/Admin
+const setPostId = asyncHandler(async (req, res) => {
+  const { postUrl } = req.body;
+  const match = postUrl.match(/instagram\.com\/(?:p|reel)\/([A-Za-z0-9_-]+)/);
+  if (!match) {
+    res.status(400);
+    throw new Error("Invalid Instagram post URL");
+  }
+  const shortcode = match[1];
+  const record = await Analytics.findOne({ campaignId: req.params.campaignId });
+  if (!record) {
+    res.status(404);
+    throw new Error("Campaign not found");
+  }
+  record.postId = shortcode;
+  await record.save();
+  res.json({ message: "Post linked", postId: shortcode });
+});
+
+// @desc    Generate AI caption + Kling prompt for a campaign
+// @route   POST /api/analytics/generate
+// @access  Private/Admin
+const generateCampaignContent = asyncHandler(async (req, res) => {
+  const { productName, productPrice, platform, niche, contentStyle } = req.body;
+
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+  const prompt = `You are a social media marketing expert for "TheNecessary", a premium streetwear clothing brand. Generate content for a social media campaign.
+
+Platform: ${platform}
+Product: ${productName} (€${productPrice})
+Niche: ${niche}
+Content Style: ${contentStyle}
+
+Return ONLY a valid JSON object with exactly these two fields (no markdown, no explanation, no code blocks):
+{
+  "caption": "engaging caption with relevant hashtags, adapted to platform tone, max 250 words",
+  "klingPrompt": "detailed Kling AI video generation prompt to animate the product image: describe movement, lighting, camera angles, mood, background, style — be cinematic and specific"
+}`;
+
+  const result = await model.generateContent(prompt);
+  const raw = result.response.text().trim();
+  const cleaned = raw.replace(/^```json\n?/, "").replace(/\n?```$/, "");
+  const content = JSON.parse(cleaned);
+  res.json(content);
+});
+
 export {
   createSocialPostRecord,
+  setPostId,
+  generateCampaignContent,
   registerClick,
   registerDirectVisit,
   registerConversion,

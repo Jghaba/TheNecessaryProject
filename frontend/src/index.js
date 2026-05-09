@@ -32,6 +32,7 @@ import ProductEditScreen from "./screens/admin/ProductEditScreen";
 import UserListScreen from "./screens/admin/UserListScreen";
 import UserEditScreen from "./screens/admin/UserEditScreen";
 import AnalyticsDashboardScreen from "./screens/admin/AnalyticsDashboardScreen";
+import CreateCampaignScreen from "./screens/admin/CreateCampaignScreen";
 import Contact from "./Components/Contact";
 
 const router = createBrowserRouter(
@@ -77,6 +78,7 @@ const router = createBrowserRouter(
         />
         <Route path="/admin/user/:id/edit" element={<UserEditScreen />} />
         <Route path="/admin/analytics" element={<AnalyticsDashboardScreen />} />
+        <Route path="/admin/campaign/create" element={<CreateCampaignScreen />} />
       </Route>
     </Route>
   )

@@ -10,6 +10,16 @@ export const analyticsApiSlice = apiSlice.injectEndpoints({
     createCampaign: builder.mutation({
       query: (data) => ({ url: ANALYTICS_URL, method: "POST", body: data }),
     }),
+    generateContent: builder.mutation({
+      query: (data) => ({ url: `${ANALYTICS_URL}/generate`, method: "POST", body: data }),
+    }),
+    linkPost: builder.mutation({
+      query: ({ campaignId, postUrl }) => ({
+        url: `${ANALYTICS_URL}/${campaignId}/post`,
+        method: "PUT",
+        body: { postUrl },
+      }),
+    }),
     triggerSync: builder.mutation({
       query: () => ({ url: `${ANALYTICS_URL}/sync`, method: "POST" }),
     }),
@@ -19,5 +29,7 @@ export const analyticsApiSlice = apiSlice.injectEndpoints({
 export const {
   useGetAnalyticsSummaryQuery,
   useCreateCampaignMutation,
+  useGenerateContentMutation,
+  useLinkPostMutation,
   useTriggerSyncMutation,
 } = analyticsApiSlice;
