@@ -8,8 +8,19 @@ import {
   Tooltip,
   ResponsiveContainer,
   Cell,
+  PieChart,
+  Pie,
+  Legend,
 } from "recharts";
-import { FaMousePointer, FaShoppingBag, FaEuroSign, FaPercent, FaSyncAlt } from "react-icons/fa";
+import {
+  FaMousePointer,
+  FaShoppingBag,
+  FaEuroSign,
+  FaPercent,
+  FaSyncAlt,
+  FaGlobe,
+  FaBullhorn,
+} from "react-icons/fa";
 import Loader from "../../Components/Loader";
 import Message from "../../Components/Message";
 import { useGetAnalyticsSummaryQuery, useTriggerSyncMutation } from "../../slices/analyticsApiSlice";
@@ -42,10 +53,20 @@ const KpiCard = ({ icon, label, value, sub, color }) => (
       <div>
         <div className="text-muted small">{label}</div>
         <div className="fw-bold fs-4">{value}</div>
-        {sub && <div className="text-muted" style={{ fontSize: "0.75rem" }}>{sub}</div>}
+        {sub && (
+          <div className="text-muted" style={{ fontSize: "0.75rem" }}>
+            {sub}
+          </div>
+        )}
       </div>
     </Card.Body>
   </Card>
+);
+
+const SectionTitle = ({ children }) => (
+  <h6 className="text-uppercase text-muted fw-semibold mb-3 mt-4" style={{ letterSpacing: "0.08em" }}>
+    {children}
+  </h6>
 );
 
 const AnalyticsDashboardScreen = () => {
@@ -70,12 +91,16 @@ const AnalyticsDashboardScreen = () => {
       </Message>
     );
 
-  const { totals, byPlatform, campaigns } = data;
+  const { campaign, direct, overall, byPlatform, campaigns } = data;
 
-  const conversionRate =
-    totals.totalClicks > 0
-      ? ((totals.totalConversions / totals.totalClicks) * 100).toFixed(1)
+  const campaignConvRate =
+    campaign.totalClicks > 0
+      ? ((campaign.totalConversions / campaign.totalClicks) * 100).toFixed(1)
       : "0.0";
+
+  const totalVisits = campaign.totalClicks + direct.directVisits;
+  const totalConversions = campaign.totalConversions + direct.directConversions;
+  const totalRevenue = overall.totalRevenue || campaign.totalRevenue + direct.directRevenue;
 
   const chartData = byPlatform.map((p) => ({
     platform: p._id,
@@ -83,6 +108,11 @@ const AnalyticsDashboardScreen = () => {
     Clicks: p.clicks,
     Conversions: p.conversions,
   }));
+
+  const attributionData = [
+    { name: "Campaign", value: parseFloat(campaign.totalRevenue.toFixed(2)), color: "#0d6efd" },
+    { name: "Direct", value: parseFloat(direct.directRevenue.toFixed(2)), color: "#198754" },
+  ];
 
   return (
     <>
@@ -94,19 +124,20 @@ const AnalyticsDashboardScreen = () => {
           onClick={handleSync}
           disabled={isSyncing}
         >
-          <FaSyncAlt className={isSyncing ? "me-2 spin" : "me-2"} />
+          <FaSyncAlt className="me-2" />
           {isSyncing ? "Syncing..." : "Sync Instagram"}
         </Button>
       </div>
-      <p className="text-muted mb-4">Social media campaign performance</p>
+      <p className="text-muted mb-2">Social media campaign performance</p>
 
-      {/* KPI Cards */}
-      <Row className="g-3 mb-4">
+      {/* Campaign KPIs */}
+      <SectionTitle><FaBullhorn className="me-2" />Campaign Traffic</SectionTitle>
+      <Row className="g-3 mb-2">
         <Col xs={12} sm={6} xl={3}>
           <KpiCard
             icon={<FaMousePointer color="#fff" size={20} />}
-            label="Total Clicks"
-            value={totals.totalClicks.toLocaleString()}
+            label="Campaign Clicks"
+            value={campaign.totalClicks.toLocaleString()}
             sub="from tracking links"
             color="#0d6efd"
           />
@@ -114,17 +145,17 @@ const AnalyticsDashboardScreen = () => {
         <Col xs={12} sm={6} xl={3}>
           <KpiCard
             icon={<FaShoppingBag color="#fff" size={20} />}
-            label="Conversions"
-            value={totals.totalConversions.toLocaleString()}
-            sub="orders placed"
-            color="#198754"
+            label="Campaign Conversions"
+            value={campaign.totalConversions.toLocaleString()}
+            sub="orders via campaigns"
+            color="#6610f2"
           />
         </Col>
         <Col xs={12} sm={6} xl={3}>
           <KpiCard
             icon={<FaEuroSign color="#fff" size={20} />}
-            label="Total Revenue"
-            value={`€${totals.totalRevenue.toLocaleString("en", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+            label="Campaign Revenue"
+            value={`€${campaign.totalRevenue.toLocaleString("en", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
             sub="attributed to campaigns"
             color="#fd7e14"
           />
@@ -132,36 +163,110 @@ const AnalyticsDashboardScreen = () => {
         <Col xs={12} sm={6} xl={3}>
           <KpiCard
             icon={<FaPercent color="#fff" size={20} />}
-            label="Conversion Rate"
-            value={`${conversionRate}%`}
+            label="Conv. Rate"
+            value={`${campaignConvRate}%`}
             sub="clicks → purchases"
             color="#6f42c1"
           />
         </Col>
       </Row>
 
-      {/* Chart */}
-      <Card className="border-0 shadow-sm mb-4">
-        <Card.Body>
-          <Card.Title className="mb-3">Revenue by Platform</Card.Title>
-          <ResponsiveContainer width="100%" height={280}>
-            <BarChart data={chartData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="platform" />
-              <YAxis tickFormatter={(v) => `€${v}`} />
-              <Tooltip formatter={(value, name) => name === "Revenue" ? `€${value}` : value} />
-              <Bar dataKey="Revenue" radius={[6, 6, 0, 0]}>
-                {chartData.map((entry) => (
-                  <Cell
-                    key={entry.platform}
-                    fill={PLATFORM_COLORS[entry.platform] || "#6c757d"}
-                  />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </Card.Body>
-      </Card>
+      {/* Direct KPIs */}
+      <SectionTitle><FaGlobe className="me-2" />Direct Traffic</SectionTitle>
+      <Row className="g-3 mb-4">
+        <Col xs={12} sm={6} xl={3}>
+          <KpiCard
+            icon={<FaMousePointer color="#fff" size={20} />}
+            label="Direct Visits"
+            value={direct.directVisits.toLocaleString()}
+            sub="without campaign link"
+            color="#20c997"
+          />
+        </Col>
+        <Col xs={12} sm={6} xl={3}>
+          <KpiCard
+            icon={<FaShoppingBag color="#fff" size={20} />}
+            label="Direct Conversions"
+            value={direct.directConversions.toLocaleString()}
+            sub="orders without campaign"
+            color="#198754"
+          />
+        </Col>
+        <Col xs={12} sm={6} xl={3}>
+          <KpiCard
+            icon={<FaEuroSign color="#fff" size={20} />}
+            label="Direct Revenue"
+            value={`€${direct.directRevenue.toLocaleString("en", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+            sub="without social media"
+            color="#0dcaf0"
+          />
+        </Col>
+        <Col xs={12} sm={6} xl={3}>
+          <KpiCard
+            icon={<FaEuroSign color="#fff" size={20} />}
+            label="Total Revenue"
+            value={`€${totalRevenue.toLocaleString("en", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+            sub={`${overall.totalOrders || totalConversions} total orders`}
+            color="#212529"
+          />
+        </Col>
+      </Row>
+
+      {/* Charts row */}
+      <Row className="g-3 mb-4">
+        <Col md={8}>
+          <Card className="border-0 shadow-sm h-100">
+            <Card.Body>
+              <Card.Title className="mb-3">Revenue by Platform</Card.Title>
+              <ResponsiveContainer width="100%" height={260}>
+                <BarChart data={chartData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="platform" />
+                  <YAxis tickFormatter={(v) => `€${v}`} />
+                  <Tooltip formatter={(value, name) => name === "Revenue" ? `€${value}` : value} />
+                  <Bar dataKey="Revenue" radius={[6, 6, 0, 0]}>
+                    {chartData.map((entry) => (
+                      <Cell
+                        key={entry.platform}
+                        fill={PLATFORM_COLORS[entry.platform] || "#6c757d"}
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </Card.Body>
+          </Card>
+        </Col>
+
+        <Col md={4}>
+          <Card className="border-0 shadow-sm h-100">
+            <Card.Body>
+              <Card.Title className="mb-3">Revenue Attribution</Card.Title>
+              <ResponsiveContainer width="100%" height={260}>
+                <PieChart>
+                  <Pie
+                    data={attributionData}
+                    cx="50%"
+                    cy="45%"
+                    outerRadius={90}
+                    dataKey="value"
+                    label={({ name, percent }) =>
+                      `${name} ${(percent * 100).toFixed(0)}%`
+                    }
+                    labelLine={false}
+                  >
+                    {attributionData.map((entry) => (
+                      <Cell key={entry.name} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Legend />
+                  <Tooltip formatter={(v) => `€${v.toFixed(2)}`} />
+                </PieChart>
+              </ResponsiveContainer>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
 
       {/* Campaign Table */}
       <Card className="border-0 shadow-sm">
@@ -214,7 +319,13 @@ const AnalyticsDashboardScreen = () => {
                     </td>
                     <td className="text-center">
                       <Badge
-                        bg={parseFloat(rate) >= 2 ? "success" : parseFloat(rate) >= 1 ? "warning" : "secondary"}
+                        bg={
+                          parseFloat(rate) >= 2
+                            ? "success"
+                            : parseFloat(rate) >= 1
+                            ? "warning"
+                            : "secondary"
+                        }
                       >
                         {rate}%
                       </Badge>
