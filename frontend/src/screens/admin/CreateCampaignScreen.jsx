@@ -216,7 +216,7 @@ const CreateCampaignScreen = () => {
             <Card className="border-0 shadow-sm">
               <Card.Body className="text-center py-5">
                 <Loader />
-                <p className="text-muted mt-3">Claude is writing your content...</p>
+                <p className="text-muted mt-3">AI is generating your content...</p>
               </Card.Body>
             </Card>
           )}
@@ -249,12 +249,12 @@ const CreateCampaignScreen = () => {
                 </Card.Body>
               </Card>
 
-              {/* Kling Prompt */}
+              {/* Runway ML Prompt */}
               <Card className="border-0 shadow-sm">
                 <Card.Body>
                   <div className="d-flex justify-content-between align-items-center mb-2">
-                    <h6 className="fw-semibold mb-0">Kling AI Video Prompt</h6>
-                    <CopyButton text={generated.klingPrompt} />
+                    <h6 className="fw-semibold mb-0">Runway ML Video Prompt</h6>
+                    <CopyButton text={generated.videoPrompt} />
                   </div>
                   <div
                     className="p-3 rounded"
@@ -265,10 +265,10 @@ const CreateCampaignScreen = () => {
                       lineHeight: 1.6,
                     }}
                   >
-                    {generated.klingPrompt}
+                    {generated.videoPrompt}
                   </div>
                   <p className="text-muted small mt-2 mb-0">
-                    Paste this prompt on <strong>kling.ai</strong> together with the product image to generate your video.
+                    Upload the product image on <strong>runwayml.com</strong> and paste this prompt to generate your video.
                   </p>
                 </Card.Body>
               </Card>
@@ -350,7 +350,7 @@ const CreateCampaignScreen = () => {
             <Card className="border-0 shadow-sm h-100">
               <Card.Body className="d-flex flex-column align-items-center justify-content-center text-center py-5 text-muted">
                 <FaMagic size={40} className="mb-3 opacity-25" />
-                <p className="mb-0">Fill in the details and click<br /><strong>Generate with AI</strong> to get started.</p>
+                <p className="mb-0">Fill in the details and click<br /><strong>Generate with AI</strong> to get your caption and video prompt.</p>
               </Card.Body>
             </Card>
           )}

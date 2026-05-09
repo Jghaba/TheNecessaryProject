@@ -183,7 +183,7 @@ Content Style: ${contentStyle}
 Return ONLY a valid JSON object with exactly these two fields (no markdown, no explanation, no code blocks):
 {
   "caption": "engaging caption with relevant hashtags, adapted to platform tone, max 250 words",
-  "klingPrompt": "detailed Kling AI video generation prompt to animate the product image: describe movement, lighting, camera angles, mood, background, style — be cinematic and specific"
+  "videoPrompt": "detailed Runway ML video generation prompt to animate the product image: describe movement, lighting, camera angles, mood, background, style — be cinematic and specific"
 }`;
 
   const result = await model.generateContent(prompt);
