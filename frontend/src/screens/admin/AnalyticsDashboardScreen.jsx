@@ -332,6 +332,9 @@ const AnalyticsDashboardScreen = () => {
                 <th>Product</th>
                 <th>Niche</th>
                 <th>Style</th>
+                <th className="text-center">Views</th>
+                <th className="text-center">Likes</th>
+                <th className="text-center">Shares</th>
                 <th className="text-center">Clicks</th>
                 <th className="text-center">Conv.</th>
                 <th className="text-end">Revenue</th>
@@ -371,6 +374,9 @@ const AnalyticsDashboardScreen = () => {
                     </td>
                     <td className="text-muted small">{c.niche}</td>
                     <td className="text-muted small">{c.contentStyle}</td>
+                    <td className="text-center text-muted">{c.views.toLocaleString()}</td>
+                    <td className="text-center text-muted">{c.likes.toLocaleString()}</td>
+                    <td className="text-center text-muted">{c.shares.toLocaleString()}</td>
                     <td className="text-center">{c.clicks.toLocaleString()}</td>
                     <td className="text-center">{c.conversions}</td>
                     <td className="text-end fw-medium">

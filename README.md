@@ -1,478 +1,674 @@
-Academia de Studii Economice din București
-Facultatea de Cibernetică, Statistică și Informatică Economică
-Master SIMPRE
+# Platformă Integrată de Marketing Digital și Analiză a Performanței Campaniilor Social Media pentru Branduri de Modă
 
+**Academia de Studii Economice din București**
+**Facultatea de Cibernetică, Statistică și Informatică Economică**
+**Master SIMPRE**
 
+**Student:** Cernica Sergiu-Rareș
+**Coordonator:** [Numele coordonatorului]
+**Sesiunea:** Iulie 2026
 
+---
 
-Proiect Cloud Computing
-Dezvoltarea aplicației web de modă intitulată 'The Necessary': 'O soluție pentru cumpărarea și vânzarea de articole vestimentare
+> Acest document reprezintă **cuprinsul orientativ și schița de conținut** al lucrării de disertație.
+> Documentul final va fi redactat în Microsoft Word conform cerințelor formale.
 
+---
 
+## Resurse proiect
 
+- **Aplicație:** https://thenecessaryproject.onrender.com/
+- **Repository GitHub:** https://github.com/[username]/TheNecessaryProject
+- **Demo video:** [link demo]
 
+---
 
+## CUPRINS ORIENTATIV
 
+```
+Introducere ......................................................... 1
+1. Descrierea problemei economice ................................... 3
+   1.1. Prezentarea organizației și a domeniului abordat ............ 3
+   1.2. Activitatea care face obiectul informatizării ............... 6
+   1.3. Analiza comparativă cu soluții software existente ........... 9
+2. Analiza și proiectarea sistemului informațional .................. 13
+   2.1. Specificarea cerințelor sistemului informatic ............... 13
+   2.2. Analiza sistemului existent ................................ 18
+   2.3. Proiectarea noului sistem .................................. 23
+3. Implementarea aplicației informatice ............................ 35
+   3.1. Prezentarea tehnologiilor utilizate ........................ 35
+   3.2. Implementarea aplicației .................................. 41
+   3.3. Prezentarea funcționalităților platformei .................. 47
+Concluzii .......................................................... 55
+Bibliografie ....................................................... 57
+Anexe .............................................................. 59
+```
 
-Student:
-Cernica Sergiu-Rareș
-Grupa:
-1132
+---
 
+## INTRODUCERE (1–2 pag.)
 
+**Ce se argumentează în introducere:**
 
+Peisajul marketingului digital a suferit o transformare profundă în ultimii ani: brandurile nu mai pot evalua eficiența campaniilor social media prin simple metrici de vanitate (număr de like-uri, followeri), ci au nevoie de instrumente care să coreleze direct activitatea din rețelele sociale cu rezultatele comerciale concrete — comenzi plasate, venituri generate, rata de conversie.
 
-București, Mai 2025
+Lucrarea de față propune o platformă software care răspunde acestei nevoi prin integrarea mai multor straturi tehnologice: un motor de comerț electronic funcțional, un sistem de generare automată de conținut bazat pe inteligență artificială (Google Gemini API), un modul de tracking al campaniilor social media cu atribuire a conversiilor și un dashboard analitic în timp real. Totodată, platforma realizează sincronizarea cu Instagram Business API (Meta Graph API) pentru colectarea automată a metricilor organice de engagement.
 
-Contents
-Link video | Prezentare proiect | Demo aplicație	3
-URL proiect | Vizitare aplicatie	3
-Link GitHub Repository	3
-Introducere	3
-Descriere Problema	4s
-Descriere API	5
-1. OrderController (Comenzi)	5
-2. ProductController (Produse)	6
-3. UserController (Utilizatori)	7
-PayPal Developer Sandbox Server	8
-MongoDB Compass	8
-Flux de date	9
-Definire Flux	9
-Exemple de request / response si Metode HTTP	9
-Autentificare și autorizare servicii utilizate + Securitate	13
-Capturi ecran aplicație	13
-Referințe	20
+Motivația cercetării derivă din absența unor soluții integrate, accesibile financiar pentru brandurile mici și medii, care să combine simultan: generarea de conținut AI, urmărirea conversiilor din social media și vizualizarea ROI-ului per campanie, fără a necesita abonamente la multiple platforme specializate.
 
- 
-Link video | Prezentare proiect | Demo aplicație
-https://youtu.be/aaK064xkrr4
+**Cuvinte cheie:** marketing digital, analytics, social media, inteligență artificială, e-commerce, MERN stack, Meta Graph API, Google Gemini, campanie, conversie, ROI.
 
-URL proiect | Vizitare aplicatie
-[Welcome to TheNecessary](https://thenecessaryproject.onrender.com/)
+---
 
-Introducere
-"The Necessary" este o aplicație web creată pentru a facilita vânzarea și cumpărarea de articole vestimentare pentru bărbați, oferind o soluție modernă și eficientă în domeniul comerțului electronic. Tema acestui proiect a fost aleasă datorită mai multor motive, fiecare contribuind la relevanța și importanța sa pe piața actuală.
-În primul rând, industria modei masculine este în continuă expansiune, iar consumatorii devin din ce în ce mai exigenți în privința calității și diversității produselor oferite. Într-o piață tot mai competitivă, există o necesitate clară pentru platforme inovatoare care să răspundă cerințelor sofisticate ale clienților moderni. Aplicația The Necessary a fost proiectată pentru a oferi o experiență de cumpărare simplificată și personalizată, adresând direct aceste cerințe printr-un design prietenos și funcționalități avansate.
-Motivația principală din spatele dezvoltării The Necessary a fost dorința de a acoperi un gol existent pe piață. În ciuda numeroaselor platforme de e-commerce disponibile, puține sunt dedicate exclusiv modei masculine și chiar mai puține oferă o gamă variată de produse, de la îmbrăcăminte casual la formală, accesibile printr-un singur click. The Necessary își propune să devină destinația principală pentru bărbații care doresc să-și definească stilul vestimentar fără a compromite confortul cumpărăturilor online.
-Pe lângă aspectul de business, alegerea acestei teme este motivată și de tendințele sociale și tehnologice actuale. Creșterea rapidă a utilizării dispozitivelor mobile și preferința pentru cumpărăturile online în detrimentul celor tradiționale au creat oportunități semnificative pentru platformele de e-commerce. The Necessary nu doar că răspunde acestei tendințe, ci o și amplifică, oferind utilizatorilor o aplicație optimizată pentru mobil, cu navigare intuitivă și opțiuni de plată securizate, contribuind astfel la o experiență de cumpărare impecabilă.
-În plus, ne-am propus să transformăm The Necessary într-o marcă de încredere, sinonimă cu calitatea și inovația. Fiecare aspect al aplicației, de la selecția produselor până la serviciul pentru clienți, este conceput pentru a depăși așteptările utilizatorilor și pentru a construi loialitatea acestora pe termen lung. Într-o eră în care fidelizarea clienților este esențială pentru succesul oricărei afaceri, The Necessary se angajează să ofere nu doar produse de top, ci și o relație autentică și constantă cu fiecare client.
-Astfel, alegerea de a dezvolta The Necessary a fost determinată de o combinație de factori economici, tehnologici și sociologici, toți convergând spre un singur obiectiv: crearea unei platforme de e-commerce de neegalat pentru moda masculină. Credem cu tărie că The Necessary va reuși să redefinească standardele în comerțul electronic vestimentar pentru bărbați, oferind o soluție care să îmbine inovația cu satisfacția clientului, într-un mod unic și eficient.
+## CAPITOLUL 1 — DESCRIEREA PROBLEMEI ECONOMICE (~10 pag.)
 
-Descriere Problema
+### 1.1. Prezentarea organizației și a domeniului abordat (~3 pag.)
 
-Problema principală pe care această lucrare o adresează este construirea unei platforme web eficiente, sigure și scalabile, capabile să susțină dezvoltarea continuă a brandului The Necessary și să creeze o experiență superioară pentru clienți. Alegerea utilizării tehnologiilor cloud devine astfel nu doar o soluție tehnică, ci și o strategie de business, esențială pentru viitorul companiei într-un mediu digital competitiv.
+**Conținut recomandat:**
 
-La începutul anului 2025, societatea comercială The Necessary S.R.L., cu sediul în București, România, se află într-o etapă de consolidare și expansiune, continuând dezvoltarea inițiată în 2024. Încă de la înființare, compania s-a remarcat printr-un concept unic dedicat modei masculine, abordând comerțul exclusiv online. Fondatorul firmei, pasionat de industria vestimentară, a pus bazele unei afaceri ce combină inovația, calitatea și expresia individuală a clienților într-un mod modern și eficient.
+**Brandul TheNecessary** este o societate comercială cu activitate exclusiv online în domeniul modei masculine, fondată cu scopul de a oferi articole vestimentare cu design minimalist la un raport calitate-preț competitiv. Distribuția se realizează integral prin intermediul platformei proprii, fără prezență în retail fizic.
 
-Cu o cifră de afaceri în creștere și o bază tot mai extinsă de clienți, firma a identificat nevoia de a optimiza și automatiza relația cu publicul prin dezvoltarea unei aplicații web performante. Această aplicație trebuie să răspundă cerințelor pieței actuale, în care utilizatorii își doresc o experiență de cumpărare fluidă, sigură și personalizată.
+Contextul economic în care activează brandul se caracterizează printr-o creștere accelerată a comerțului electronic la nivel european și național. Conform datelor Eurostat, piața de e-commerce din România a înregistrat o creștere anuală de peste 20% în perioada 2022–2024, iar sectorul modei online reprezintă una dintre categoriile cu cel mai ridicat potențial de expansiune.
 
-Problema principală identificată constă în lipsa unei platforme centralizate, scalabile și suficient de flexibile care să susțină creșterea rapidă a firmei, să faciliteze interacțiunea eficientă cu clienții și să asigure un grad ridicat de securitate pentru datele personale și tranzacționale. În plus, din analiza concurenței reiese că multe platforme existente au interfețe greoaie, procese de cumpărare fragmentate și măsuri de securitate insuficiente – aspecte pe care The Necessary dorește să le depășească.
+Particularitatea acestui domeniu constă în dependența tot mai accentuată față de canalele social media ca instrument principal de achiziție a clienților. Platforme precum Instagram, TikTok sau YouTube sunt utilizate nu doar ca vitrine de prezentare, ci ca vectori direcți de trafic comercial, iar măsurarea eficienței acestor canale devine o necesitate operațională.
 
-Astfel, se conturează nevoia dezvoltării unei aplicații web moderne, adaptată nevoilor actuale ale pieței de e-commerce, cu accent pe:
+**Se va descrie:**
+- Structura companiei, piața-țintă, categorii de produse
+- Poziționarea brandului în peisajul competitiv al modei online
+- Importanța canalelor digitale pentru modelul de business adoptat
+- Dependența de social media ca principal canal de marketing și provocările de măsurare a ROI-ului aferent
 
-•	Accesibilitate și interfață intuitivă, ușor de utilizat de pe orice dispozitiv;
+### 1.2. Activitatea care face obiectul informatizării (~4 pag.)
 
-•	Funcționalități avansate de căutare și filtrare, pentru a facilita selecția produselor;
+**Conținut recomandat:**
 
-•	Proces de achiziție optimizat, fără bariere tehnice sau pași inutili;
+Activitatea supusă informatizării este **managementul integrat al campaniilor de marketing pe rețele sociale**, o funcție critică a oricărui brand contemporan de e-commerce, care în prezent se desfășoară fragmentat și fără instrumente dedicate de măsurare.
 
-•	Protecția datelor cu caracter personal, prin implementarea celor mai noi standarde de securitate informatică (inclusiv criptare, autentificare multifactor, politici stricte de acces și monitorizare continuă);
+Procesul curent (neautomatizat) implică:
+1. Crearea manuală a conținutului pentru postări (texte, hashtag-uri)
+2. Publicarea pe platformele sociale fără o legătură directă cu magazinul online
+3. Monitorizarea separată a metricilor de engagement (Instagram Insights, TikTok Analytics)
+4. Imposibilitatea corelării unui click dintr-o postare cu o comandă finalizată
+5. Calculul ROI realizat manual, pe baza estimărilor
 
-•	Infrastructură scalabilă și eficientă, capabilă să susțină un volum mare de accesări și comenzi, fără întreruperi.
+**Informatizarea vizează:**
+- Automatizarea generării de conținut prin AI (caption-uri optimizate per platformă, prompturi pentru generare video)
+- Crearea de URL-uri de tracking unice per campanie, care permit atribuirea precisă a vizitelor și conversiilor
+- Sincronizarea automată cu Instagram Business API pentru preluarea metricilor organice
+- Centralizarea datelor din toate sursele (campanii social media + trafic direct) într-un singur dashboard analitic
+- Calculul automat al KPI-urilor: clicks, conversii, venituri atribuite, cost per conversie, ROI
 
-Pentru atingerea acestor obiective, The Necessary S.R.L. a ales să se bazeze pe tehnologii cloud, care oferă o serie de avantaje esențiale în dezvoltarea aplicației:
-
-•	Scalabilitate automată, care permite adaptarea resurselor în funcție de trafic;
-
-•	Acces global și disponibilitate ridicată, esențiale pentru o platformă care se adresează unei piețe online dinamice;
-
-•	Securitate integrată și actualizări constante, prin servicii cloud de încredere
-
-•	Costuri operaționale optimizate, prin eliminarea necesității de infrastructură fizică proprie.
-Descriere API
-
-Tip API: REST
-Sistemul implementează un API de tip REST, structurat în jurul resurselor principale: comenzi (orders), produse (products) și utilizatori (users). API-ul oferă metode standard HTTP: GET, POST, PUT, DELETE.
-
-1. OrderController (Comenzi)
-Acest controller gestionează logica legată de comenzile plasate de utilizatori.
-
-Rute implementate:
-•	POST /api/orders – Creează o comandă nouă. Verifică stocul produselor și calculează prețurile (total, taxe, transport).
-
-•	GET /api/orders/myorders – Returnează comenzile utilizatorului logat.
-
-•	GET /api/orders/:id – Returnează o comandă după ID (doar dacă utilizatorul este proprietarul sau admin).
-
-•	PUT /api/orders/:id/pay – Marchează o comandă ca plătită. Integrare cu PayPal pentru validare.
-
-•	PUT /api/orders/:id/deliver – Marchează o comandă ca livrată (doar pentru admin).
-
-•	GET /api/orders – Returnează toate comenzile (doar pentru admin), cu paginare.
-
-Observații:
-•	Include verificări de stoc și actualizări de inventar în momentul plasării comenzii.
-
-•	Folosește middleware pentru autentificare și autorizare.
-
-•	Folosește funcții externe pentru integrarea cu PayPal: verifyPayPalPayment și checkIfNewTransaction.
-
-
-Fișier .js de referință:
-
- 
-2. ProductController (Produse)
-Acest controller oferă funcționalități complete pentru gestionarea produselor.
-
-Rute implementate:
-•	GET /api/products – Returnează lista de produse cu paginare și opțiune de căutare.
-
-•	GET /api/products/:id – Returnează un produs după ID.
-
-•	POST /api/products – Creează un produs nou (privat).
-
-•	PUT /api/products/:id – Actualizează un produs (doar admin).
-
-•	DELETE /api/products/:id – Șterge un produs (doar admin).
-
-•	POST /api/products/:id/reviews – Adaugă o recenzie la produs (privat, o singură recenzie per utilizator).
-
-•	GET /api/products/top – Returnează top 5 produse după rating.
-
-Observații:
-•	Permite adăugarea și calcularea ratingurilor din recenzii.
-
-•	Susține paginarea și filtrarea după keyword în listarea produselor.
-
-•	Verifică dacă utilizatorul a recenzat deja produsul.
-
-Fișier .js de referință:
- 
-3. UserController (Utilizatori)
-Gestionează autentificarea, înregistrarea și administrarea utilizatorilor.
-
-Rute implementate:
-•	POST /api/users/login – Autentifică un utilizator și returnează un token JWT în cookies.
-
-•	POST /api/users – Înregistrează un nou utilizator.
-
-•	POST /api/users/logout – Șterge token-ul JWT și deloghează utilizatorul.
-
-•	GET /api/users/profile – Returnează profilul utilizatorului logat.
-
-•	PUT /api/users/profile – Actualizează profilul utilizatorului logat.
-
-•	GET /api/users – Returnează toți utilizatorii (doar admin, cu paginare).
-
-•	GET /api/users/:id – Returnează un utilizator după ID (doar admin).
-
-•	DELETE /api/users/:id – Șterge un utilizator (doar admin; protecție pentru admini).
-
-•	PUT /api/users/:id – Actualizează un utilizator (doar admin).
-
-Observații:
-•	Toate parolele sunt criptate.
-
-•	Tokenul JWT este generat în cookie HTTP-only pentru securitate.
-
-•	Verifică drepturile utilizatorului înainte de operații de tip admin.
-
-Fișier .js de referință:
-
- 
-
-În cadrul dezvoltării sistemului REST API pentru gestionarea comenzilor, produselor și utilizatorilor, au fost utilizate două instrumente externe esențiale pentru testare și validare: PayPal Developer Sandbox și MongoDB Compass. Acestea, deși nu fac parte din logica principală a API-ului, au avut un rol important în verificarea funcționalității și stabilității aplicației.
-
-PayPal Developer Sandbox Server
-Rolul în sistem:
-
-•	PayPal Sandbox este o platformă de testare oferită de PayPal pentru simularea plăților online.
-
-•	A fost utilizat pentru a testa endpoint-ul PUT /api/orders/:id/pay, responsabil cu marcarea unei comenzi ca fiind plătită.
-
-•	API-ul nostru trimite o solicitare către serverele PayPal Sandbox pentru a verifica validitatea unei tranzacții simulate, fără a folosi fonduri reale.
-
-Beneficii:
-
-•	Permite testarea completă a fluxului de plată într-un mediu sigur.
-
-•	Ajută la prevenirea erorilor în integrarea cu PayPal Live.
-
-•	Oferă feedback clar asupra validității unui ID de tranzacție.
-
-Legătura cu API-ul:
-
-•	API-ul implementează integrarea cu un API extern (PayPal), ceea ce presupune autentificare, validare și comunicare în ambele direcții.
-
-•	Tranzacțiile simulate au fost esențiale pentru testarea funcționalității de marcare a comenzilor ca „plătite”.
-
-MongoDB Compass
-Rolul în sistem:
-
-•	MongoDB Compass este o interfață grafică pentru lucrul cu baza de date MongoDB.
-
-•	A fost folosit pentru inspecția și validarea manuală a datelor gestionate de API: comenzi, produse, utilizatori, etc.
-
-•	A oferit o modalitate rapidă de a vizualiza documentele MongoDB fără a folosi interfața în linie de comandă.
-
-Beneficii:
-
-•	Permite verificarea structurii și valorilor din documente în timp real.
-
-•	Ajută la identificarea ușoară a erorilor în salvarea datelor prin API.
-
-•	Este util în testarea operațiilor CRUD implementate în controllere.
-
-Legătura cu API-ul:
-
-•	MongoDB Compass nu este parte directă a API-ului, însă este un instrument de suport în procesul de testare.
-
-•	A fost utilizat pentru confirmarea că API-ul funcționează corect la nivel de persistare a datelor.
-Flux de date
-Definire Flux
-Aplicația React construita folosește Redux Toolkit și RTK Query, astfel fluxul de date reprezintă traseul parcurs de datele aplicației, de la momentul inițializării unei cereri (request) până la actualizarea interfeței (UI) în funcție de răspuns (response).
-
-Acest flux implică:
-
-•	Componenta React inițiază o acțiune (ex. register, updateProfile, createOrder).
-
-•	RTK Query face automat cererea HTTP către API.
-
-•	Răspunsul este automat stocat în store-ul Redux.
-
-•	Componenta se reîncărcă (re-render) pe baza noilor date.
-
-•	Redux poate folosi și slice-uri auxiliare (ex. authSlice, cartSlice) pentru a păstra starea aplicației (ex. userInfo, cartItems, shippingAddress).
-
-Exemple de request / response si Metode HTTP
-
-1. Înregistrare utilizator (RegisterScreen)
-•	Endpoint: /api/users/register
-•	Cod sursa:
- 
-
-•	Metodă HTTP: POST
-
-Request body (JSON):
+**Se va prezenta:**
+- Fluxul actual al activității de marketing (diagrama flux)
+- Punctele slabe ale procesului neautomatizat
+- Obiectivele măsurabile ale noii platforme
+- Beneficiile anticipate: reducerea timpului de creare conținut, vizibilitate completă asupra performanței campaniilor
+
+### 1.3. Analiza comparativă cu soluții software existente (~3 pag.)
+
+**Conținut recomandat:**
+
+| Criteriu | TheNecessary Platform | Hootsuite | Sprout Social | Meta Business Suite | Shopify Analytics |
+|---|---|---|---|---|---|
+| Generare conținut AI | ✅ Gemini 2.5 Flash | ❌ | Parțial | ❌ | ❌ |
+| Tracking conversii social media | ✅ URL unic per campanie | ❌ | ❌ | Parțial (Meta only) | Parțial |
+| Sincronizare Instagram API | ✅ | ✅ | ✅ | ✅ | ❌ |
+| Dashboard ROI per campanie | ✅ | Parțial | ✅ | Parțial | ❌ |
+| Integrare e-commerce nativă | ✅ | ❌ | ❌ | ❌ | ✅ |
+| Multi-platformă | ✅ (IG, TikTok, YT, FB) | ✅ | ✅ | ❌ (Meta only) | ❌ |
+| Cost | Open-source / self-hosted | $99+/lună | $249+/lună | Gratuit (limitat) | Inclus Shopify |
+| Prompturi generare video (AI) | ✅ Runway ML | ❌ | ❌ | ❌ | ❌ |
+
+**Concluzie comparativă:** Niciuna dintre soluțiile analizate nu oferă simultan generarea de conținut AI, tracking-ul conversiilor din social media și calculul ROI în cadrul aceleiași platforme integrate cu un motor de e-commerce. Valoarea adăugată a soluției propuse constă tocmai în această integrare verticală, care elimină necesitatea utilizării simultane a 3–4 instrumente separate.
+
+---
+
+## CAPITOLUL 2 — ANALIZA ȘI PROIECTAREA SISTEMULUI INFORMAȚIONAL (~20 pag.)
+
+### 2.1. Specificarea cerințelor sistemului informatic (~5 pag.)
+
+**Cerințe funcționale:**
+
+**Modul E-commerce (baza sistemului):**
+- RF01: Vizualizarea catalogului de produse cu paginare și filtrare după cuvânt cheie
+- RF02: Gestionarea coșului de cumpărături cu persistență în localStorage
+- RF03: Fluxul de checkout în trei pași: adresă livrare → metodă plată → confirmare
+- RF04: Integrarea cu PayPal SDK pentru procesarea plăților online
+- RF05: Urmărirea comenzilor (stare: plasată / plătită / livrată) pentru client și admin
+- RF06: Sistem de recenzii cu rating per produs (o recenzie per utilizator per produs)
+- RF07: Panel admin: CRUD produse, gestionare utilizatori, gestionare comenzi
+
+**Modul Marketing Analytics (contribuția disertației):**
+- RF08: Crearea campaniilor social media cu selecție produs, platformă, nișă, stil conținut
+- RF09: Generarea automată de caption și prompt video prin Google Gemini 2.5 Flash API
+- RF10: Generarea URL-ului de tracking unic (bazat pe campaignId UUID) per campanie
+- RF11: Înregistrarea click-urilor la accesarea URL-ului de tracking
+- RF12: Atribuirea conversiilor (comenzilor plătite) campaniei sursă prin sesiune
+- RF13: Sincronizarea automată a metricilor organice Instagram (views, likes, shares, saved) prin Meta Graph API
+- RF14: Asocierea unui post Instagram publicat cu campania corespunzătoare prin URL
+- RF15: Dashboard analitic cu KPI-uri agregate: clicks totale, conversii, venituri, rată conversie, ROI
+- RF16: Filtrarea datelor din dashboard după interval de timp (preset-uri sau interval personalizat)
+- RF17: Vizualizarea grafică a performanței per platformă (bar chart venituri, pie chart atribuire)
+- RF18: Urmărirea traficului direct (vizite și conversii fără link de campanie)
+
+**Cerințe non-funcționale:**
+- RNF01: Timp de răspuns API sub 500ms pentru operații CRUD standard
+- RNF02: Autentificare JWT cu token stocat în cookie HTTP-only (prevenire XSS)
+- RNF03: Separarea rolurilor utilizator/admin la nivel de middleware
+- RNF04: Interfață responsive, utilizabilă pe mobil și desktop
+- RNF05: Disponibilitate 99%+ prin deployment pe platformă cloud (Render)
+- RNF06: Scalabilitate verticală prin MongoDB Atlas (cloud database)
+
+### 2.2. Analiza sistemului existent (~5 pag.)
+
+**Conținut recomandat:**
+
+**Diagrama cazurilor de utilizare (Use Case Diagram):**
+
+Actori:
+- **Vizitator** (neautentificat): browsing produse, înregistrare cont, accesare URL tracking campanie
+- **Client** (autentificat): toate drepturile vizitatorului + plasare comenzi, plată PayPal, vizualizare profil și istoric
+- **Administrator**: toate drepturile clientului + panel admin complet, creare campanii, generare conținut AI, vizualizare dashboard analytics, trigger sync Instagram
+
+**Cazuri de utilizare principale:**
+
+*Flux client:*
+- UC01: Căutare și filtrare produse
+- UC02: Vizualizare detalii produs + recenzii
+- UC03: Adăugare în coș și modificare cantități
+- UC04: Checkout (adresă → plată → confirmare)
+- UC05: Plată prin PayPal
+- UC06: Urmărire stare comandă
+- UC07: Adăugare recenzie produs
+
+*Flux administrator:*
+- UC08: Creare/editare/ștergere produse
+- UC09: Gestionare utilizatori și roluri
+- UC10: Marcare comenzi ca livrate
+- UC11: Creare campanie social media (AI-assisted)
+- UC12: Generare caption + prompt video Runway ML prin Gemini API
+- UC13: Obținere URL de tracking per campanie
+- UC14: Asociere post Instagram la campanie
+- UC15: Triggering sincronizare Instagram Business API
+- UC16: Vizualizare dashboard analytics cu filtrare temporală
+
+**Diagrama de stare a campaniei:**
+```
+[Nouă] → [Conținut generat] → [Campanie creată / URL obținut] → [Post asociat] → [Sincronizată]
+                                       ↓                              ↓
+                               [Clicks înregistrate]         [Metrics actualizate]
+                                       ↓
+                               [Conversii atribuite]
+```
+
+### 2.3. Proiectarea noului sistem (~10 pag.)
+
+#### 2.3.1. Arhitectura generală
+
+Platforma adoptă arhitectura **MERN Stack** (MongoDB, Express.js, React.js, Node.js) cu separare clară între client (frontend) și server (backend), comunicare prin API REST și deployment cloud pe Render cu baza de date gestionată prin MongoDB Atlas.
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    CLIENT (React SPA)                    │
+│  Redux Store │ RTK Query │ React Router │ React Bootstrap│
+└──────────────────────┬──────────────────────────────────┘
+                       │ HTTPS / REST API
+┌──────────────────────▼──────────────────────────────────┐
+│                 SERVER (Node.js + Express)               │
+│  JWT Middleware │ Routes │ Controllers │ AsyncHandler    │
+└──────┬──────────────────────────┬──────────────────────-┘
+       │                          │
+┌──────▼──────┐         ┌─────────▼──────────────────────┐
+│  MongoDB    │         │      API-uri externe             │
+│  Atlas      │         │  • PayPal SDK                   │
+│  (cloud)    │         │  • Google Gemini 2.5 Flash API  │
+└─────────────┘         │  • Meta Graph API v19.0         │
+                        └────────────────────────────────-┘
+```
+
+#### 2.3.2. Proiectarea bazei de date
+
+**Colecția Users:**
+```
 {
-  "name": "string",
-  "email": "string",
-  "password": "string"
+  _id: ObjectId,
+  name: String (required),
+  email: String (required, unique),
+  password: String (bcrypt hash),
+  isAdmin: Boolean (default: false),
+  createdAt: Date,
+  updatedAt: Date
 }
+```
 
-
-Răspuns (Succes):
-
+**Colecția Products:**
+```
 {
-  "_id": "string",
-  "name": "string",
-  "email": "string",
-  "token": "string"
+  _id: ObjectId,
+  user: ObjectId → Users,
+  name: String,
+  image: String,
+  description: String,
+  brand: String,
+  category: String,
+  price: Number,
+  countInStock: Number,
+  rating: Number,
+  numReviews: Number,
+  reviews: [{ name, rating, comment, user → Users }],
+  createdAt, updatedAt
 }
+```
 
-Flux:
-
-•	Utilizatorul introduce datele în formular.
-
-•	Se trimite request POST cu datele.
-
-•	Server validează datele, creează utilizatorul, generează un token JWT.
-
-•	Tokenul este stocat în Redux (state auth).
-
-•	Navigare automată după succes.
-
-Metode securitate:
-
-•	Validare server-side a datelor (email unic, parolă puternică).
-
-•	Token JWT emis pentru autentificare.
-
-•	Comunicarea ar trebui să fie prin HTTPS.
-
-•	Erori bine gestionate și afișate utilizatorului.
-
-2. Actualizare profil utilizator (ProfileScreen)
-•	Endpoint: /api/users/profile
-•	Cod sursa:
- 
-
-•	Metodă HTTP: PUT
-
-Request body (JSON):
-
+**Colecția Orders:**
+```
 {
-  "_id": "string",
-  "name": "string",
-  "email": "string",
-  "password": "string"  // poate fi gol dacă nu se schimbă
+  _id: ObjectId,
+  user: ObjectId → Users,
+  orderItems: [{ name, qty, image, price, product → Products }],
+  shippingAddress: { address, city, postalCode, country },
+  paymentMethod: String,
+  paymentResult: { id, status, update_time, email_address },
+  taxPrice, shippingPrice, totalPrice: Number,
+  isPaid: Boolean, paidAt: Date,
+  isDelivered: Boolean, deliveredAt: Date,
+  createdAt, updatedAt
 }
-Răspuns (Succes):
+```
 
+**Colecția Analytics** *(nouă — contribuție disertație):*
+```
 {
-  "_id": "string",
-  "name": "string",
-  "email": "string",
-  "token": "string"
+  _id: ObjectId,
+  campaignId: String (UUID, unique) — folosit în URL tracking,
+  source: Enum['Instagram','TikTok','YouTube','Facebook'],
+  niche: String,
+  contentStyle: String,
+  postId: String — shortcode Instagram pentru sincronizare API,
+  product: ObjectId → Products,
+  clicks: Number,
+  conversions: Number,
+  totalRevenue: Number,
+  cost: Number,
+  views: Number,       ← sincronizat din Instagram API
+  likes: Number,       ← sincronizat din Instagram API
+  shares: Number,      ← sincronizat din Instagram API
+  saved: Number,       ← sincronizat din Instagram API
+  commentCount: Number,
+  createdAt, updatedAt
 }
-Flux:
+```
 
-•	Datele curente sunt încărcate în formular.
+**Colecția SiteMetrics** *(nouă — contribuție disertație):*
+```
+{
+  _id: 'global' (singleton),
+  directVisits: Number,
+  directConversions: Number,
+  directRevenue: Number
+}
+```
 
-•	Utilizatorul modifică datele.
+#### 2.3.3. Proiectarea API REST
 
-•	Se trimite request PUT cu datele actualizate.
+**Resurse existente (e-commerce):**
 
-•	Server validează și actualizează profilul.
+| Metodă | Endpoint | Acces | Descriere |
+|---|---|---|---|
+| POST | /api/users | Public | Înregistrare utilizator |
+| POST | /api/users/login | Public | Autentificare + JWT cookie |
+| POST | /api/users/logout | Privat | Ștergere JWT cookie |
+| GET | /api/users/profile | Privat | Profil utilizator curent |
+| PUT | /api/users/profile | Privat | Actualizare profil |
+| GET | /api/users | Admin | Listă utilizatori (paginat) |
+| GET | /api/products | Public | Listă produse (paginat, filtrat) |
+| GET | /api/products/:id | Public | Detalii produs |
+| POST | /api/products | Admin | Creare produs |
+| PUT | /api/products/:id | Admin | Actualizare produs |
+| DELETE | /api/products/:id | Admin | Ștergere produs |
+| POST | /api/products/:id/reviews | Privat | Adăugare recenzie |
+| POST | /api/orders | Privat | Plasare comandă |
+| GET | /api/orders/myorders | Privat | Comenzile utilizatorului |
+| GET | /api/orders/:id | Privat/Admin | Detalii comandă |
+| PUT | /api/orders/:id/pay | Privat | Marcare plătită (PayPal) |
+| PUT | /api/orders/:id/deliver | Admin | Marcare livrată |
 
-•	Tokenul este reemis și actualizat în store.
+**Resurse noi — Marketing Analytics** *(contribuție disertație):*
 
-Metode securitate:
+| Metodă | Endpoint | Acces | Descriere |
+|---|---|---|---|
+| GET | /api/analytics | Admin | Dashboard KPI (cu filtrare dată) |
+| POST | /api/analytics | Admin | Creare înregistrare campanie |
+| POST | /api/analytics/generate | Admin | Generare conținut AI (Gemini) |
+| POST | /api/analytics/sync | Admin | Trigger sincronizare Instagram API |
+| POST | /api/analytics/direct-visit | Public | Înregistrare vizită directă |
+| POST | /api/analytics/direct-convert | Privat | Înregistrare conversie directă |
+| PUT | /api/analytics/:campaignId/click | Public | Înregistrare click din tracking URL |
+| PUT | /api/analytics/:campaignId/convert | Privat | Înregistrare conversie din campanie |
+| PUT | /api/analytics/:campaignId/post | Admin | Asociere URL post Instagram |
 
-•	Autentificare obligatorie (token JWT transmis în header Authorization).
+#### 2.3.4. Proiectarea mecanismului de tracking și atribuire
 
-•	Validări parolă și date personale.
+**Fluxul de atribuire a conversiilor:**
 
-•	Protecție împotriva modificării profilului altor utilizatori (verificare identitate).
+```
+Utilizator accesează URL tracking:
+/?social_analytics_id=<campaignId>
+        ↓
+Frontend detectează parametru → stochează campaignId în sessionStorage
+        ↓
+Backend: PUT /api/analytics/<campaignId>/click → clicks += 1
+        ↓
+Utilizatorul plasează comandă → orderController verifică sessionStorage
+        ↓
+PUT /api/analytics/<campaignId>/convert → conversions += 1, revenue += totalPrice
+        ↓
+sessionStorage cleared (atribuire single-touch)
+```
 
-•	HTTPS.
+**Fluxul de sincronizare Instagram:**
 
-3. Obținerea comenzilor utilizatorului (ProfileScreen)
-•	Endpoint: /api/orders/myorders
-•	Cod sursa:
- 
+```
+Admin apasă "Sync Instagram"
+        ↓
+POST /api/analytics/sync → instagramScraper.js
+        ↓
+GET https://graph.facebook.com/v19.0/<ACCOUNT_ID>/media
+    ?fields=id,permalink,like_count,comments_count,reach,shares,saved
+        ↓
+Pentru fiecare media: extragere shortcode din permalink
+        ↓
+Analytics.findOneAndUpdate({ postId: shortcode }) → actualizare views/likes/shares/saved
+        ↓
+Răspuns: { updated: N }
+```
 
-•	Metodă HTTP: GET
+#### 2.3.5. Diagrame de secvență
 
-Request: N/A
+**Se vor realiza diagrame de secvență UML pentru:**
+1. Fluxul de autentificare (login cu JWT)
+2. Fluxul de plasare comandă (checkout → PayPal → confirmare)
+3. Fluxul de creare campanie cu AI (selectare produs → Gemini API → URL tracking)
+4. Fluxul de sincronizare Instagram (trigger admin → Meta API → actualizare DB)
+5. Fluxul de tracking conversie (click URL → sessionStorage → checkout → atribuire)
 
-Răspuns (Succes): Array JSON cu comenzile utilizatorului:
+---
 
-[
-  {
-    "_id": "string",
-    "createdAt": "string",
-    "totalPrice": "number",
-    "isPaid": "boolean",
-    "paidAt": "string|null",
-    "isDelivered": "boolean",
-    "deliveredAt": "string|null"
-  },
-  ...
-]
-Flux:
+## CAPITOLUL 3 — IMPLEMENTAREA APLICAȚIEI INFORMATICE (~10 pag.)
 
-•	La încărcarea profilului, se face un request GET pentru comenzi.
+### 3.1. Prezentarea tehnologiilor utilizate (~6 pag.)
 
-•	Server returnează lista comenzilor aferente utilizatorului autentificat.
+#### Backend
 
-•	Metode securitate:
+**Node.js v18+**
+Mediu de execuție JavaScript server-side, bazat pe motorul V8, ce permite construirea de servere web cu performanță ridicată și model non-blocking I/O. A fost ales pentru compatibilitatea nativă cu formatul JSON utilizat de MongoDB și pentru ecosistemul npm.
 
-•	Autentificare JWT obligatorie.
+**Express.js v4**
+Framework web minimalist pentru Node.js, utilizat pentru definirea rutelor REST, aplicarea middleware-urilor (autentificare, gestionare erori) și servirea conținutului static. Arhitectura controller-route-middleware asigură separarea responsabilităților.
 
-•	Server returnează doar comenzile utilizatorului curent.
+**MongoDB + Mongoose**
+MongoDB este o bază de date NoSQL orientată pe documente, stocând datele în format BSON (Binary JSON). Mongoose adaugă un strat ODM (Object Document Mapping) cu definirea schemelor, validări și metode de interogare. Baza de date este găzduită în cloud prin MongoDB Atlas.
 
-•	HTTPS.
+**JSON Web Tokens (JWT)**
+Mecanism de autentificare stateless prin token-uri semnate criptografic. Token-ul este stocat în cookie HTTP-only (inaccesibil din JavaScript) pentru a preveni atacurile XSS. Middleware-ul `protect` validează token-ul la fiecare request protejat.
 
-4. Salvare metodă de plată (PaymentScreen)
-•	Endpoint: N/A (date stocate în Redux local)
-•	Cod sursa:
- 
+**bcryptjs**
+Bibliotecă pentru hashing-ul parolelor utilizând algoritmul bcrypt cu salt factor 10. Parolele nu sunt stocate niciodată în text clar.
 
+**Google Generative AI SDK (@google/generative-ai)**
+SDK oficial Google pentru accesarea API-ului Gemini. Utilizat cu modelul `gemini-2.5-flash` pentru generarea de conținut de marketing (caption-uri social media și prompturi pentru generare video prin Runway ML). Promptul este structurat ca instrucțiune expert și returnează JSON validat înainte de a fi transmis clientului.
 
-Flux:
+**Meta Graph API v19.0 (Instagram Business API)**
+API-ul oficial Meta pentru accesarea datelor din conturile Instagram Business. Utilizat pentru sincronizarea metricilor organice ale postărilor (reach/views, like_count, comments_count, shares, saved). Autentificarea se realizează prin Long-Lived Access Token cu permisiunile: `instagram_basic`, `instagram_manage_insights`, `pages_show_list`.
 
-•	Utilizatorul alege metoda de plată.
+**PayPal JavaScript SDK + @paypal/paypal-js**
+Integrare cu PayPal Developer API pentru procesarea plăților. În development se utilizează sandbox-ul PayPal; în producție, credențialele live.
 
-•	Alegerea este salvată în state-ul Redux (slice cart).
+#### Frontend
 
-•	Navigare către ecranul următor.
+**React 18**
+Bibliotecă JavaScript pentru construirea de interfețe utilizator prin componente reutilizabile și Virtual DOM. Utilizează hooks (`useState`, `useEffect`, `useRef`) pentru gestionarea stării locale.
 
-Metode securitate:
+**Redux Toolkit + RTK Query**
+Redux Toolkit simplifică gestionarea stării globale prin slice-uri și reduceri standardizate. RTK Query extinde Redux cu un layer de data fetching care automatizează caching-ul, invalidarea și re-fetch-ul datelor de la API. Toate apelurile HTTP sunt centralizate în slices dedicate (`productsApiSlice`, `analyticsApiSlice` etc.).
 
-•	Datele sensibile (metoda de plată) sunt stocate temporar în store, nu trimise până la plasarea comenzii.
+**React Router DOM v6**
+Routing client-side cu suport pentru rute protejate (`PrivateRoute`, `AdminRoute`), navigare programatică și parametri de URL.
 
-•	Validare simplă pe client.
+**React Bootstrap 5**
+Componentă UI bazată pe Bootstrap 5, oferind un sistem de grid responsive, componente pre-stilizate (Card, Table, Badge, Form, Button) și utilitare CSS.
 
-Autentificare și autorizare servicii utilizate + Securitate
+**Recharts**
+Bibliotecă de vizualizare a datelor pentru React, utilizată pentru:
+- `BarChart` — comparație venituri per platformă social media
+- `PieChart` — distribuția atribuirii veniturilor (campanii vs. trafic direct)
 
-Capturi ecran aplicație
-a)	Interfata Paginii Principale
+**React Toastify**
+Sistem de notificări non-blocking (toast notifications) pentru feedback utilizator în urma acțiunilor (creare campanie, sync, erori API).
 
- 
-Figura 1. Interfața paginii principale
+#### Infrastructure & Deployment
 
-Pagina principală a aplicației "The Necessary" oferă utilizatorilor o navigare ușoară și acces rapid la produsele cele mai apreciate de clienți prin intermediul banner-ului. Antetul facilitează căutarea și navigarea, iar secțiunea de produse recente permite utilizatorilor să vadă și să exploreze rapid ofertele disponibile. Subsolul oferă informații suplimentare și link-uri utile, completând astfel experiența de utilizare a paginii principale.
-b)	Interfata Paginii de produs
+**Render (Cloud Hosting)**
+Platformă PaaS (Platform as a Service) pentru deployment-ul serverului Node.js. Suportă variabile de mediu securizate, redeploy automat la push pe branch-ul main și HTTPS by default.
 
- 
-Figura 2. Interfața de produs
+**MongoDB Atlas**
+Serviciu cloud pentru MongoDB cu clustering, backup automat, monitorizare și scalare. Tier M0 (gratuit) suficient pentru volumul unui brand mic/mediu.
 
-Interfața de produs a aplicației "The Necessary" oferă utilizatorilor toate informațiile necesare despre produs într-un format clar și accesibil. Imaginea mare a produsului, împreună cu detaliile esențiale și butonul de adăugare în coș, facilitează procesul de cumpărare. Secțiunea de recenzii oferă feedback util de la alți utilizatori, doar în cazul in care aceștia sunt logați si cu o limitare de o recenzie / produs.
+### 3.2. Implementarea aplicației (~4 pag.)
 
-c)	Interfața Coșului de cumpărături
- 
-Figura 3. Interfața coșului de cumpărături
+**Se vor prezenta pașii principali de implementare, ca mini-tutorial:**
 
-Interfața coșului de cumpărături este proiectată pentru a oferi utilizatorilor o experiență de cumpărături facilă și eficientă, utilizatorii fiind capabili în a vizualiza toate produsele adăugate în coș, putând modifica și cantitatea acestora direct din această pagină dar putând să și elimine produsele nedorite. Secțiunea de subtotal afișează suma totală a articolelor din coș, iar butonul "Proceed To Checkout" permite utilizatorilor să finalizeze achiziția rapid și fără efort. Antetul rămâne consistent pentru navigare ușoară și acces rapid la alte secțiuni ale site-ului.
+**Pasul 1: Configurarea mediului**
+```bash
+# Clonare repository și instalare dependențe
+npm install          # backend (din /backend)
+cd frontend && npm install  # frontend
+```
 
-d)	Interfețele parcurse pentru Checkout
+Variabile de mediu necesare (`.env`):
+```
+MONGO_URI=mongodb+srv://...
+JWT_SECRET=...
+PAYPAL_CLIENT_ID=...
+GEMINI_API_KEY=...
+INSTAGRAM_ACCESS_TOKEN=...
+INSTAGRAM_BUSINESS_ACCOUNT_ID=...
+```
 
-În procesul de comandă al aplicației "The Necessary," utilizatorii parcurg trei pagini principale:
+**Pasul 2: Popularea bazei de date**
+```bash
+npm run data:import    # inserare date de test
+npm run data:destroy   # ștergere date
+```
 
-•	Shipping (Livrare): Colectează informațiile de livrare.
- 
-Figura 4. Interfața pentru introducerea datelor de livrare
+Seeder-ul inserează în ordine: Users → Products → Analytics (referențiind produsele create) → Orders (referențiind useri și produse) → SiteMetrics (singleton global).
 
-•	Payment Method (Metodă de Plată): Permite selectarea metodei de plată.
- 
-Figura 5. Interfața pentru selectarea metodei de plată
+**Pasul 3: Implementarea modulului de generare AI**
 
-•	Place Order (Confirmare Comandă): Afișează un rezumat complet al comenzii pentru confirmare finală.
- 
-Figura 6. Interfața pentru sumarul comenzii
+Endpoint-ul `POST /api/analytics/generate` primește parametrii campaniei, construiește un prompt structurat pentru Gemini 2.5 Flash și parsează răspunsul JSON returnat:
 
-Acest flux asigură o experiență de cumpărare simplă și eficientă, ghidând utilizatorii prin fiecare pas necesar pentru a plasa și finaliza o comandă. Fiecare pagină este concepută pentru a fi intuitivă și ușor de utilizat, asigurând astfel satisfacția utilizatorului și eficiența procesului de comandă.
+```javascript
+const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+const result = await model.generateContent(prompt);
+const cleaned = result.response.text().trim()
+  .replace(/^```json\n?/, "").replace(/\n?```$/, "");
+const content = JSON.parse(cleaned);  // { caption, videoPrompt }
+```
 
+**Pasul 4: Implementarea tracking-ului de conversii**
 
-e)	Interfața redirectării pentru plată
+La accesarea unui URL de tip `/?social_analytics_id=<uuid>`:
+```javascript
+// frontend — index.js (useEffect)
+const urlParams = new URLSearchParams(window.location.search);
+const campaignId = urlParams.get("social_analytics_id");
+if (campaignId) {
+  sessionStorage.setItem("campaignId", campaignId);
+  registerClick(campaignId);  // PUT /api/analytics/:id/click
+}
+```
 
- 
-Figura 7. Interfața pentru plată cu PayPal
-Pagina de rezumat al comenzii din aplicația "The Necessary" este concepută pentru a oferi utilizatorilor o imagine completă și detaliată asupra comenzii lor, înainte de a finaliza plata. Utilizatorii pot vedea informațiile de livrare, metoda de plată aleasă, starea plății și detalii despre produsele comandate și au integrată opțiunea de plată prin PayPal ce adaugă o modalitate sigură și convenabilă de a finaliza tranzacția. 
+La plasarea comenzii cu succes:
+```javascript
+const campaignId = sessionStorage.getItem("campaignId");
+if (campaignId) {
+  registerConversion({ campaignId, revenue: order.totalPrice });
+  sessionStorage.removeItem("campaignId");
+}
+```
 
-f)	Intefața de profil a utilizatorului
+**Pasul 5: Implementarea sincronizării Instagram**
 
- 
-Figura 8. Interfața de prof
+```javascript
+// instagramScraper.js
+const mediaRes = await fetch(
+  `https://graph.facebook.com/v19.0/${ACCOUNT_ID}/media` +
+  `?fields=id,permalink,like_count,comments_count,reach,shares,saved` +
+  `&access_token=${ACCESS_TOKEN}`
+);
+for (const media of mediaRes.data) {
+  const shortcode = extractShortcode(media.permalink);
+  await Analytics.findOneAndUpdate(
+    { postId: shortcode },
+    { views: media.reach, likes: media.like_count, ... }
+  );
+}
+```
 
-Interfața paginii de profil a utilizatorului din aplicație oferă utilizatorilor o modalitate simplă și eficientă de a gestiona informațiile personale și de a vizualiza istoricul comenzilor. Secțiunea "User Profile" permite actualizarea numelui, adresei de email și parolei, în timp ce secțiunea "My Orders" afișează detalii esențiale despre comenzile plasate, incluzând statusul plății și livrării.Astfel, se face posibilă ținerea la curent a clienților.
+### 3.3. Prezentarea funcționalităților platformei (~4 pag.)
 
-g)	Interfața de administrare a produselor
+**Se vor prezenta cu capturi de ecran:**
 
- 
-Figura 9. Interfața de administrare a produselor
+**a) Pagina principală și catalogul de produse**
+- Grid responsive cu produse, sistem de paginare, bară de căutare
+- Afișare rating, preț, disponibilitate stoc
 
-Interfața de administrare a produselor din aplicația "The Necessary" este concepută pentru a oferi administratorilor un control complet asupra inventarului de produse extras in baza de date. Tabelul detaliat afișează toate informațiile esențiale despre produse, butoanele de editare și ștergere permit gestionarea rapidă și eficientă a fiecărui produs, iar butonul de creare a produselor facilitează adăugarea rapidă a noilor produse în magazin. Controalele de paginare asigură că administratorii pot naviga ușor printr-o listă extinsă de produse, menținând astfel o organizare clară și accesibilă a inventarului.
+**b) Pagina de produs și sistemul de recenzii**
+- Galerie imagine, detalii produs, selector cantitate
+- Secțiunea de recenzii cu rating individual
 
-h)	Interfețele de sign-in si sign-up
+**c) Fluxul de checkout**
+- Pasul 1: Adresă de livrare (formular validat)
+- Pasul 2: Metodă de plată (PayPal)
+- Pasul 3: Sumar comandă + buton finalizare
+- Redirecționare PayPal → confirmare plată
 
- 
-Figura 10. Interțata de Sign In
- 
-Figura 11. Interfața de Sign Up
+**d) Panel administrare — Gestionare produse/utilizatori/comenzi**
+- Tabele cu operații CRUD inline
+- Marcare livrată direct din lista de comenzi
 
-Interfețele de autentificare și înregistrare sunt concepute pentru a oferi utilizatorilor o experiență simplă și eficientă de accesare și creare a conturilor. Pagina de autentificare permite utilizatorilor existenți să se conecteze rapid la conturile lor și aruncă o eroare dacă se încearcă autentificarea fără un cont existent,iar pagina de înregistrare facilitează crearea de conturi noi, incluzând restricții pe email și parolă pentru a asigura validitatea datelor introduse. 
+**e) Creare Campanie Social Media (funcționalitate nouă — AI)**
+- Selector platformă (Instagram / TikTok / YouTube / Facebook)
+- Dropdown produse din catalog cu preview imagine și preț
+- Câmpuri: nișă, cost estimat, stil conținut
+- Buton "Generate with AI" → Gemini API → afișare caption + prompt Runway ML
+- Buton "Copy" pentru caption și prompt
+- Buton "Create Campaign & Get Tracking Link" → URL unic generat
+- Câmp opțional "Link Instagram Post" → asociere shortcode pentru sync
 
-Referințe
+**f) Analytics Dashboard (funcționalitate nouă)**
+- KPI Cards Campaign Traffic: clicks, conversii, venituri, rată conversie
+- KPI Cards Direct Traffic: vizite directe, conversii directe, venituri directe, total venituri
+- Bar Chart: venituri per platformă social media (colorat per brand platformă)
+- Pie Chart: atribuire venituri — campanii vs. trafic direct
+- Filtru temporal: preset-uri (All time / 7 / 30 / 90 zile) sau interval personalizat
+- Tabel campanii: Platformă, Produs, Nișă, Stil, Views, Likes, Shares, Clicks, Conversii, Venituri, Cost, ROI%, Rată conversie
+- Buton "Sync Instagram" → actualizare metrici organice din Meta Graph API
 
-•	React Documentation. React – A JavaScript library for building user interfaces. https://reactjs.org/docs/getting-started.html
+**Comparație cu alte soluții:** față de un instrument standalone de tip Hootsuite sau Sprout Social, platforma TheNecessary oferă vizibilitate completă asupra întregii pâlnii de marketing — de la engagement-ul organic pe Instagram până la comanda finalizată în magazin — fără a necesita exporturi de date sau corelații manuale.
 
-•	Smith, John. Modern Web Development. TechBooks Publishing, 2020.
+**Îmbunătățiri posibile:**
+- Integrare directă cu TikTok Business API pentru metrici organice TikTok
+- Email marketing automation (triggere post-cumpărare)
+- A/B testing de caption-uri generate de AI
+- Prognoze de vânzări bazate pe machine learning
 
-•	Redux Toolkit Documentation. https://redux-toolkit.js.org/
+---
 
-•	Stack Overflow. "How to handle JWT authentication in React." https://stackoverflow.com/questions/
+## CONCLUZII (1–2 pag.)
 
-•	MongoDB Documentation. https://docs.mongodb.com/manual/ 
+**Conținut recomandat:**
 
+Lucrarea de față a demonstrat fezabilitatea și utilitatea practică a unei platforme integrate care combină comerțul electronic cu instrumentele de marketing digital bazate pe inteligență artificială. Obiectivele propuse au fost realizate în totalitate:
+
+1. **E-commerce funcțional** — platforma acoperă integral ciclul de viață al unui produs: listare, achiziție, plată, livrare, recenzii.
+
+2. **Generare automată de conținut AI** — integrarea cu Google Gemini 2.5 Flash API permite crearea de caption-uri optimizate per platformă și prompturi pentru generare video în câteva secunde, reducând semnificativ timpul alocat creării de conținut.
+
+3. **Tracking precis al conversiilor** — mecanismul de URL-uri unice per campanie, combinat cu atribuirea prin sessionStorage, permite identificarea exactă a comenzilor generate din fiecare postare social media.
+
+4. **Dashboard analitic integrat** — centralizarea metricilor de engagement (Instagram API) cu datele comerciale (comenzi, venituri) oferă o perspectivă completă asupra ROI-ului per campanie, eliminând nevoia de corelări manuale între instrumente separate.
+
+**Contribuția personală** constă în proiectarea și implementarea completă a modulului de marketing analytics, integrat organic într-un sistem e-commerce existent, cu accent pe fluxul de date de la rețelele sociale spre baza de date și vizualizarea acestora în timp real.
+
+**Limitări actuale și perspective de dezvoltare:** token-ul de acces Meta Graph API necesită reînnoire periodică (maxim 60 de zile pentru Long-Lived Token), iar integrarea cu TikTok Business API pentru metrici organice reprezintă o extensie naturală a platformei. Pe termen mediu, introducerea unui modul de prognoză a vânzărilor bazat pe modele de machine learning ar consolida componenta de business intelligence a sistemului.
+
+---
+
+## BIBLIOGRAFIE
+
+**Format Vancouver — exemple structurate:**
+
+```
+[1] MongoDB, Inc., MongoDB Documentation — Aggregation Pipeline,
+    https://www.mongodb.com/docs/manual/aggregation/, [accesat Mai 2026]
+
+[2] Google, Gemini API Documentation — Generative AI for Developers,
+    https://ai.google.dev/docs, [accesat Mai 2026]
+
+[3] Meta for Developers, Instagram Graph API Reference — Media,
+    https://developers.facebook.com/docs/instagram-api/reference/ig-media,
+    [accesat Mai 2026]
+
+[4] Redux Toolkit, RTK Query Overview,
+    https://redux-toolkit.js.org/rtk-query/overview, [accesat Mai 2026]
+
+[5] M. Marcelino, MERN Stack — Building a Full-Stack Application,
+    Packt Publishing, 2022, ISBN 978-1-80107-601-5
+
+[6] React Core Team, React Documentation — Hooks Reference,
+    https://react.dev/reference/react, [accesat Mai 2026]
+
+[7] PayPal Developer, REST API Reference — Orders v2,
+    https://developer.paypal.com/docs/api/orders/v2/, [accesat Mai 2026]
+
+[8] Recharts Team, Recharts — A Composable Charting Library,
+    https://recharts.org/en-US, [accesat Mai 2026]
+
+[9] Render, Platform Documentation — Node.js Deployment,
+    https://render.com/docs/node-express-app, [accesat Mai 2026]
+
+[10] OWASP Foundation, OWASP Top Ten — A07:2021 Identification and Authentication Failures,
+     https://owasp.org/Top10/A07_2021/, [accesat Mai 2026]
+
+[11] Eurostat, E-commerce Statistics — Online Purchases by Individuals,
+     https://ec.europa.eu/eurostat/statistics-explained/index.php/E-commerce_statistics,
+     [accesat Mai 2026]
+
+[12] Express.js, Express API Reference,
+     https://expressjs.com/en/api.html, [accesat Mai 2026]
+
+[13] Mongoose, Mongoose v8 Documentation,
+     https://mongoosejs.com/docs/, [accesat Mai 2026]
+
+[14] JSON Web Tokens, JWT Introduction,
+     https://jwt.io/introduction, [accesat Mai 2026]
+
+[15] Runway ML, Runway API Documentation — Video Generation,
+     https://docs.runwayml.com/, [accesat Mai 2026]
+```
+
+---
+
+## ANEXE
+
+**Anexa 1:** Schema completă a bazei de date (diagrama ERD)
+**Anexa 2:** Diagrame de secvență UML pentru fluxurile principale
+**Anexa 3:** Capturi de ecran — interfața completă a platformei
+**Anexa 4:** Fragmente de cod sursă relevante
+  - analyticsController.js — endpoint generare AI
+  - instagramScraper.js — sincronizare Meta Graph API
+  - AnalyticsDashboardScreen.jsx — dashboard analytics
+  - CreateCampaignScreen.jsx — creator campanii
+**Anexa 5:** Configurare deployment Render + variabile de mediu
+**Anexa 6:** Colecțiile MongoDB — structura documentelor (exemple JSON)

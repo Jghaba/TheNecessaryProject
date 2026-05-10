@@ -16,13 +16,13 @@ const users = [
   },
   {
     name: "Sergiu Cernica",
-    email: "sergiu@gmail.com",
+    email: "sergiu@thenecessary.com",
     password: bcrypt.hashSync("123456", 10),
     isAdmin: false,
   },
   {
-    name: "Rares",
-    email: "rares@gmail.com",
+    name: "Rares Ionescu",
+    email: "rares@thenecessary.com",
     password: bcrypt.hashSync("123456", 10),
     isAdmin: false,
   },
