@@ -1,4 +1,5 @@
-import { Row, Col, Card, Table, Badge, Button } from "react-bootstrap";
+import { useState } from "react";
+import { Row, Col, Card, Table, Badge, Button, Form, InputGroup } from "react-bootstrap";
 import {
   BarChart,
   Bar,
@@ -69,8 +70,25 @@ const SectionTitle = ({ children }) => (
   </h6>
 );
 
+const PRESETS = [
+  { label: "All time", days: null },
+  { label: "Last 7 days", days: 7 },
+  { label: "Last 30 days", days: 30 },
+  { label: "Last 90 days", days: 90 },
+];
+
 const AnalyticsDashboardScreen = () => {
-  const { data, isLoading, error, refetch } = useGetAnalyticsSummaryQuery();
+  const [preset, setPreset] = useState(null);
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+
+  const queryParams = preset
+    ? { from: new Date(Date.now() - preset * 86400000).toISOString(), to: new Date().toISOString() }
+    : from && to
+    ? { from: new Date(from).toISOString(), to: new Date(to + "T23:59:59").toISOString() }
+    : {};
+
+  const { data, isLoading, error, refetch } = useGetAnalyticsSummaryQuery(queryParams);
   const [triggerSync, { isLoading: isSyncing }] = useTriggerSyncMutation();
 
   const handleSync = async () => {
@@ -129,6 +147,41 @@ const AnalyticsDashboardScreen = () => {
         </Button>
       </div>
       <p className="text-muted mb-2">Social media campaign performance</p>
+
+      {/* Date filter */}
+      <Card className="border-0 shadow-sm mb-4">
+        <Card.Body className="py-2">
+          <div className="d-flex align-items-center gap-2 flex-wrap">
+            {PRESETS.map((p) => (
+              <Button
+                key={p.label}
+                size="sm"
+                variant={preset === p.days ? "dark" : "outline-secondary"}
+                onClick={() => { setPreset(p.days); setFrom(""); setTo(""); }}
+              >
+                {p.label}
+              </Button>
+            ))}
+            <div className="ms-auto d-flex align-items-center gap-2">
+              <Form.Control
+                type="date"
+                size="sm"
+                value={from}
+                onChange={(e) => { setFrom(e.target.value); setPreset(null); }}
+                style={{ width: 150 }}
+              />
+              <span className="text-muted small">to</span>
+              <Form.Control
+                type="date"
+                size="sm"
+                value={to}
+                onChange={(e) => { setTo(e.target.value); setPreset(null); }}
+                style={{ width: 150 }}
+              />
+            </div>
+          </div>
+        </Card.Body>
+      </Card>
 
       {/* Campaign KPIs */}
       <SectionTitle><FaBullhorn className="me-2" />Campaign Traffic</SectionTitle>
@@ -282,6 +335,8 @@ const AnalyticsDashboardScreen = () => {
                 <th className="text-center">Clicks</th>
                 <th className="text-center">Conv.</th>
                 <th className="text-end">Revenue</th>
+                <th className="text-end">Cost</th>
+                <th className="text-center">ROI</th>
                 <th className="text-center">Conv. Rate</th>
               </tr>
             </thead>
@@ -291,6 +346,10 @@ const AnalyticsDashboardScreen = () => {
                   c.clicks > 0
                     ? ((c.conversions / c.clicks) * 100).toFixed(1)
                     : "0.0";
+                const roi =
+                  c.cost > 0
+                    ? (((c.totalRevenue - c.cost) / c.cost) * 100).toFixed(0)
+                    : null;
                 return (
                   <tr key={c._id}>
                     <td>
@@ -316,6 +375,18 @@ const AnalyticsDashboardScreen = () => {
                     <td className="text-center">{c.conversions}</td>
                     <td className="text-end fw-medium">
                       €{c.totalRevenue.toFixed(2)}
+                    </td>
+                    <td className="text-end text-muted small">
+                      {c.cost > 0 ? `€${c.cost.toFixed(2)}` : "—"}
+                    </td>
+                    <td className="text-center">
+                      {roi !== null ? (
+                        <Badge bg={parseInt(roi) >= 0 ? "success" : "danger"}>
+                          {roi}%
+                        </Badge>
+                      ) : (
+                        <span className="text-muted">—</span>
+                      )}
                     </td>
                     <td className="text-center">
                       <Badge

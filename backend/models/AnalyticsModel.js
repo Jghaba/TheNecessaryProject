@@ -32,6 +32,7 @@ const analyticsSchema = mongoose.Schema(
     clicks: { type: Number, default: 0 },
     conversions: { type: Number, default: 0 },
     totalRevenue: { type: Number, default: 0 },
+    cost: { type: Number, default: 0 },
 
     // Instagram Graph API fields — populated by scraper
     views: { type: Number, default: 0 },

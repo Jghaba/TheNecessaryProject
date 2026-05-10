@@ -4,7 +4,7 @@ import { ANALYTICS_URL } from "../constants";
 export const analyticsApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getAnalyticsSummary: builder.query({
-      query: () => ({ url: ANALYTICS_URL }),
+      query: (params = {}) => ({ url: ANALYTICS_URL, params }),
       keepUnusedDataFor: 30,
     }),
     createCampaign: builder.mutation({

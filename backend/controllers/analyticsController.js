@@ -9,8 +9,8 @@ import { syncInstagramMetrics } from "../utils/instagramScraper.js";
 // @route   POST /api/analytics
 // @access  Private/Admin
 const createSocialPostRecord = asyncHandler(async (req, res) => {
-  const { source, niche, contentStyle, postId, product } = req.body;
-  const record = new Analytics({ source, niche, contentStyle, postId, product });
+  const { source, niche, contentStyle, postId, product, cost } = req.body;
+  const record = new Analytics({ source, niche, contentStyle, postId, product, cost: Number(cost) || 0 });
   const createdRecord = await record.save();
   res.status(201).json(createdRecord);
 });
@@ -74,7 +74,12 @@ const registerDirectConversion = asyncHandler(async (req, res) => {
 // @route   GET /api/analytics
 // @access  Private/Admin
 const getAnalyticsSummary = asyncHandler(async (req, res) => {
+  const { from, to } = req.query;
+  const dateFilter =
+    from && to ? { createdAt: { $gte: new Date(from), $lte: new Date(to) } } : {};
+
   const [campaignTotals] = await Analytics.aggregate([
+    { $match: dateFilter },
     {
       $group: {
         _id: null,
@@ -90,6 +95,7 @@ const getAnalyticsSummary = asyncHandler(async (req, res) => {
   ]);
 
   const byPlatform = await Analytics.aggregate([
+    { $match: dateFilter },
     {
       $group: {
         _id: "$source",
@@ -101,7 +107,7 @@ const getAnalyticsSummary = asyncHandler(async (req, res) => {
     { $sort: { revenue: -1 } },
   ]);
 
-  const campaigns = await Analytics.find({})
+  const campaigns = await Analytics.find(dateFilter)
     .populate("product", "name price image")
     .sort({ totalRevenue: -1 });
 

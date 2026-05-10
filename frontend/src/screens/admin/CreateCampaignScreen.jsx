@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {
-  Row, Col, Card, Form, Button, Badge, InputGroup,
+  Row, Col, Card, Form, Button, Badge, InputGroup, Image,
 } from "react-bootstrap";
 import {
   FaMagic, FaRocket, FaCopy, FaCheck, FaLink, FaInstagram,
@@ -49,6 +49,7 @@ const CreateCampaignScreen = () => {
   const [campaignId, setCampaignId] = useState(null);
   const [postUrl, setPostUrl] = useState("");
   const [postLinked, setPostLinked] = useState(false);
+  const [cost, setCost] = useState("");
 
   const { data: productsData, isLoading: loadingProducts } = useGetProductsQuery({
     keyword: "",
@@ -103,6 +104,7 @@ const CreateCampaignScreen = () => {
         niche,
         contentStyle,
         product: selectedProduct,
+        cost: parseFloat(cost) || 0,
       }).unwrap();
       const url = `${window.location.origin}/?social_analytics_id=${result.campaignId}`;
       setTrackingUrl(url);
@@ -170,6 +172,21 @@ const CreateCampaignScreen = () => {
                 )}
               </Form.Group>
 
+              {/* Product preview */}
+              {selectedProductObj && (
+                <div className="d-flex align-items-center gap-3 p-2 mb-3 rounded" style={{ background: "#f8f9fa" }}>
+                  <Image
+                    src={selectedProductObj.image}
+                    alt={selectedProductObj.name}
+                    style={{ width: 56, height: 56, objectFit: "cover", borderRadius: 8 }}
+                  />
+                  <div>
+                    <div className="fw-medium" style={{ fontSize: "0.9rem" }}>{selectedProductObj.name}</div>
+                    <div className="text-muted small">€{selectedProductObj.price}</div>
+                  </div>
+                </div>
+              )}
+
               {/* Niche */}
               <Form.Group className="mb-3">
                 <Form.Label className="fw-medium">Niche</Form.Label>
@@ -179,6 +196,20 @@ const CreateCampaignScreen = () => {
                   value={niche}
                   onChange={(e) => setNiche(e.target.value)}
                 />
+              </Form.Group>
+
+              {/* Estimated Cost */}
+              <Form.Group className="mb-3">
+                <Form.Label className="fw-medium">Estimated Ad Cost (€)</Form.Label>
+                <Form.Control
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="e.g. 50.00"
+                  value={cost}
+                  onChange={(e) => setCost(e.target.value)}
+                />
+                <Form.Text className="text-muted">Used to calculate ROI in the dashboard.</Form.Text>
               </Form.Group>
 
               {/* Content Style */}
