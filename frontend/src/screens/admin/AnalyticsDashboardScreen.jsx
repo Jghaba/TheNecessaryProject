@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Row, Col, Card, Table, Badge, Button, Form, InputGroup } from "react-bootstrap";
 import {
   BarChart,
@@ -29,7 +29,7 @@ import { toast } from "react-toastify";
 
 const PLATFORM_COLORS = {
   Instagram: "#C13584",
-  TikTok: "#010101",
+  TikTok: "#69C9D0",
   YouTube: "#FF0000",
   Facebook: "#1877F2",
 };
@@ -81,11 +81,23 @@ const AnalyticsDashboardScreen = () => {
   const [preset, setPreset] = useState(null);
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
+  const [appliedRange, setAppliedRange] = useState({ from: "", to: "" });
+  const debounceRef = useRef(null);
+
+  const handleDateChange = (field, value) => {
+    const next = field === "from" ? { from: value, to } : { from, to: value };
+    if (field === "from") setFrom(value); else setTo(value);
+    setPreset(null);
+    clearTimeout(debounceRef.current);
+    if (next.from && next.to) {
+      debounceRef.current = setTimeout(() => setAppliedRange(next), 600);
+    }
+  };
 
   const queryParams = preset
     ? { from: new Date(Date.now() - preset * 86400000).toISOString(), to: new Date().toISOString() }
-    : from && to
-    ? { from: new Date(from).toISOString(), to: new Date(to + "T23:59:59").toISOString() }
+    : appliedRange.from && appliedRange.to
+    ? { from: new Date(appliedRange.from).toISOString(), to: new Date(appliedRange.to + "T23:59:59").toISOString() }
     : {};
 
   const { data, isLoading, error, refetch } = useGetAnalyticsSummaryQuery(queryParams);
@@ -167,7 +179,7 @@ const AnalyticsDashboardScreen = () => {
                 type="date"
                 size="sm"
                 value={from}
-                onChange={(e) => { setFrom(e.target.value); setPreset(null); }}
+                onChange={(e) => handleDateChange("from", e.target.value)}
                 style={{ width: 150 }}
               />
               <span className="text-muted small">to</span>
@@ -175,7 +187,7 @@ const AnalyticsDashboardScreen = () => {
                 type="date"
                 size="sm"
                 value={to}
-                onChange={(e) => { setTo(e.target.value); setPreset(null); }}
+                onChange={(e) => handleDateChange("to", e.target.value)}
                 style={{ width: 150 }}
               />
             </div>
@@ -325,6 +337,12 @@ const AnalyticsDashboardScreen = () => {
       <Card className="border-0 shadow-sm">
         <Card.Body>
           <Card.Title className="mb-3">Campaign Breakdown</Card.Title>
+          {campaigns.length === 0 ? (
+            <div className="text-center py-5 text-muted">
+              <FaBullhorn size={32} className="mb-3 opacity-25" />
+              <p className="mb-0">No campaigns found for the selected period.<br />Create one from <strong>Admin → Create Campaign</strong>.</p>
+            </div>
+          ) : (
           <Table responsive hover className="align-middle mb-0">
             <thead className="table-light">
               <tr>
@@ -412,6 +430,7 @@ const AnalyticsDashboardScreen = () => {
               })}
             </tbody>
           </Table>
+          )}
         </Card.Body>
       </Card>
     </>

@@ -23,6 +23,7 @@ const analyticsSchema = mongoose.Schema(
     },
     postId: {
       type: String,
+      index: true,
     },
     product: {
       type: mongoose.Schema.Types.ObjectId,

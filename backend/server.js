@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
+import compression from "compression";
 dotenv.config();
 import connectDB from "./config/db.js";
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
@@ -20,6 +21,7 @@ connectDB(); //connect to MongoDB
 const app = express();
 
 app.use(helmet());
+app.use(compression());
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,

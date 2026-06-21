@@ -87,56 +87,65 @@ const getAnalyticsSummary = asyncHandler(async (req, res) => {
   const { from, to } = req.query;
   const dateFilter =
     from && to ? { createdAt: { $gte: new Date(from), $lte: new Date(to) } } : {};
+  const orderDateFilter = from && to
+    ? { isPaid: true, paidAt: { $gte: new Date(from), $lte: new Date(to) } }
+    : { isPaid: true };
 
-  const [campaignTotals] = await Analytics.aggregate([
-    { $match: dateFilter },
-    {
-      $group: {
-        _id: null,
-        totalClicks: { $sum: "$clicks" },
-        totalConversions: { $sum: "$conversions" },
-        totalRevenue: { $sum: "$totalRevenue" },
-        totalViews: { $sum: "$views" },
-        totalLikes: { $sum: "$likes" },
-        totalShares: { $sum: "$shares" },
-        totalSaved: { $sum: "$saved" },
+  const [
+    [campaignTotals],
+    byPlatform,
+    campaigns,
+    siteMetricsDoc,
+    [orderTotals],
+  ] = await Promise.all([
+    Analytics.aggregate([
+      { $match: dateFilter },
+      {
+        $group: {
+          _id: null,
+          totalClicks: { $sum: "$clicks" },
+          totalConversions: { $sum: "$conversions" },
+          totalRevenue: { $sum: "$totalRevenue" },
+          totalViews: { $sum: "$views" },
+          totalLikes: { $sum: "$likes" },
+          totalShares: { $sum: "$shares" },
+          totalSaved: { $sum: "$saved" },
+        },
       },
-    },
+    ]),
+    Analytics.aggregate([
+      { $match: dateFilter },
+      {
+        $group: {
+          _id: "$source",
+          clicks: { $sum: "$clicks" },
+          conversions: { $sum: "$conversions" },
+          revenue: { $sum: "$totalRevenue" },
+        },
+      },
+      { $sort: { revenue: -1 } },
+    ]),
+    Analytics.find(dateFilter)
+      .populate("product", "name price image")
+      .sort({ totalRevenue: -1 }),
+    SiteMetrics.findOne({ _id: "global" }),
+    Order.aggregate([
+      { $match: orderDateFilter },
+      {
+        $group: {
+          _id: null,
+          totalRevenue: { $sum: "$totalPrice" },
+          totalOrders: { $sum: 1 },
+        },
+      },
+    ]),
   ]);
 
-  const byPlatform = await Analytics.aggregate([
-    { $match: dateFilter },
-    {
-      $group: {
-        _id: "$source",
-        clicks: { $sum: "$clicks" },
-        conversions: { $sum: "$conversions" },
-        revenue: { $sum: "$totalRevenue" },
-      },
-    },
-    { $sort: { revenue: -1 } },
-  ]);
-
-  const campaigns = await Analytics.find(dateFilter)
-    .populate("product", "name price image")
-    .sort({ totalRevenue: -1 });
-
-  const siteMetrics = (await SiteMetrics.findOne({ _id: "global" })) || {
+  const siteMetrics = siteMetricsDoc || {
     directVisits: 0,
     directConversions: 0,
     directRevenue: 0,
   };
-
-  const [orderTotals] = await Order.aggregate([
-    { $match: { isPaid: true } },
-    {
-      $group: {
-        _id: null,
-        totalRevenue: { $sum: "$totalPrice" },
-        totalOrders: { $sum: 1 },
-      },
-    },
-  ]);
 
   res.json({
     campaign: campaignTotals || {

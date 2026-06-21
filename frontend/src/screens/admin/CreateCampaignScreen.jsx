@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {
-  Row, Col, Card, Form, Button, Badge, InputGroup, Image,
+  Row, Col, Card, Form, Button, Badge, InputGroup, Image, Modal,
 } from "react-bootstrap";
 import {
   FaMagic, FaRocket, FaCopy, FaCheck, FaLink, FaInstagram,
@@ -17,7 +17,7 @@ import {
 
 const PLATFORMS = [
   { value: "Instagram", icon: <FaInstagram />, color: "#C13584" },
-  { value: "TikTok", icon: <FaTiktok />, color: "#010101" },
+  { value: "TikTok", icon: <FaTiktok />, color: "#69C9D0" },
   { value: "YouTube", icon: <FaYoutube />, color: "#FF0000" },
   { value: "Facebook", icon: <FaFacebook />, color: "#1877F2" },
 ];
@@ -50,10 +50,12 @@ const CreateCampaignScreen = () => {
   const [postUrl, setPostUrl] = useState("");
   const [postLinked, setPostLinked] = useState(false);
   const [cost, setCost] = useState("");
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const { data: productsData, isLoading: loadingProducts } = useGetProductsQuery({
     keyword: "",
     pageNumber: 1,
+    pageSize: 100,
   });
 
   const [generateContent, { isLoading: isGenerating }] = useGenerateContentMutation();
@@ -306,18 +308,41 @@ const CreateCampaignScreen = () => {
 
               {/* Create Campaign */}
               {!trackingUrl ? (
-                <Button
-                  variant="success"
-                  size="lg"
-                  onClick={handleCreateCampaign}
-                  disabled={isCreating}
-                >
-                  {isCreating ? (
-                    "Creating..."
-                  ) : (
-                    <><FaRocket className="me-2" />Create Campaign & Get Tracking Link</>
-                  )}
-                </Button>
+                <>
+                  <Button
+                    variant="success"
+                    size="lg"
+                    onClick={() => setShowConfirm(true)}
+                    disabled={isCreating}
+                  >
+                    <FaRocket className="me-2" />Create Campaign & Get Tracking Link
+                  </Button>
+
+                  <Modal show={showConfirm} onHide={() => setShowConfirm(false)} centered>
+                    <Modal.Header closeButton>
+                      <Modal.Title>Confirm Campaign Creation</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                      <p>This will create a new campaign record in the database:</p>
+                      <ul className="mb-0">
+                        <li><strong>Platform:</strong> {platform}</li>
+                        <li><strong>Product:</strong> {selectedProductObj?.name}</li>
+                        <li><strong>Niche:</strong> {niche}</li>
+                        <li><strong>Cost:</strong> {cost ? `€${cost}` : "—"}</li>
+                      </ul>
+                    </Modal.Body>
+                    <Modal.Footer>
+                      <Button variant="secondary" onClick={() => setShowConfirm(false)}>Cancel</Button>
+                      <Button
+                        variant="success"
+                        disabled={isCreating}
+                        onClick={() => { setShowConfirm(false); handleCreateCampaign(); }}
+                      >
+                        {isCreating ? "Creating..." : "Yes, Create"}
+                      </Button>
+                    </Modal.Footer>
+                  </Modal>
+                </>
               ) : (
                 <Card className="border-0 shadow-sm border-start border-success border-4">
                   <Card.Body>
@@ -344,7 +369,7 @@ const CreateCampaignScreen = () => {
                 <Card className="border-0 shadow-sm">
                   <Card.Body>
                     <h6 className="fw-semibold mb-1">
-                      <FaInstagram className="me-2 text-danger" />
+                      <FaInstagram className="me-2" style={{ color: "#C13584" }} />
                       Link Instagram Post (optional)
                     </h6>
                     <p className="text-muted small mb-3">
