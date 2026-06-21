@@ -23,6 +23,12 @@ export const analyticsApiSlice = apiSlice.injectEndpoints({
     triggerSync: builder.mutation({
       query: () => ({ url: `${ANALYTICS_URL}/sync`, method: "POST" }),
     }),
+    deleteCampaign: builder.mutation({
+      query: (campaignId) => ({
+        url: `${ANALYTICS_URL}/${campaignId}`,
+        method: "DELETE",
+      }),
+    }),
   }),
 });
 
@@ -32,4 +38,5 @@ export const {
   useGenerateContentMutation,
   useLinkPostMutation,
   useTriggerSyncMutation,
+  useDeleteCampaignMutation,
 } = analyticsApiSlice;

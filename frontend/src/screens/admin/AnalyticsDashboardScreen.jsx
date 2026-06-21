@@ -21,10 +21,12 @@ import {
   FaSyncAlt,
   FaGlobe,
   FaBullhorn,
+  FaTrash,
+  FaSearch,
 } from "react-icons/fa";
 import Loader from "../../Components/Loader";
 import Message from "../../Components/Message";
-import { useGetAnalyticsSummaryQuery, useTriggerSyncMutation } from "../../slices/analyticsApiSlice";
+import { useGetAnalyticsSummaryQuery, useTriggerSyncMutation, useDeleteCampaignMutation } from "../../slices/analyticsApiSlice";
 import { toast } from "react-toastify";
 
 const PLATFORM_COLORS = {
@@ -100,8 +102,21 @@ const AnalyticsDashboardScreen = () => {
     ? { from: new Date(appliedRange.from).toISOString(), to: new Date(appliedRange.to + "T23:59:59").toISOString() }
     : {};
 
+  const [tableFilter, setTableFilter] = useState("");
   const { data, isLoading, error, refetch } = useGetAnalyticsSummaryQuery(queryParams);
   const [triggerSync, { isLoading: isSyncing }] = useTriggerSyncMutation();
+  const [deleteCampaign] = useDeleteCampaignMutation();
+
+  const handleDelete = async (campaignId) => {
+    if (!window.confirm("Delete this campaign? This cannot be undone.")) return;
+    try {
+      await deleteCampaign(campaignId).unwrap();
+      toast.success("Campaign deleted");
+      refetch();
+    } catch (err) {
+      toast.error(err?.data?.message || "Delete failed");
+    }
+  };
 
   const handleSync = async () => {
     try {
@@ -121,16 +136,14 @@ const AnalyticsDashboardScreen = () => {
       </Message>
     );
 
-  const { campaign, direct, overall, byPlatform, campaigns } = data;
+  const { campaign, direct, overall, byPlatform, campaigns, hasDateFilter } = data;
 
   const campaignConvRate =
     campaign.totalClicks > 0
       ? ((campaign.totalConversions / campaign.totalClicks) * 100).toFixed(1)
       : "0.0";
 
-  const totalVisits = campaign.totalClicks + direct.directVisits;
-  const totalConversions = campaign.totalConversions + direct.directConversions;
-  const totalRevenue = overall.totalRevenue || campaign.totalRevenue + direct.directRevenue;
+  const totalRevenue = overall.totalRevenue || 0;
 
   const chartData = byPlatform.map((p) => ({
     platform: p._id,
@@ -237,42 +250,56 @@ const AnalyticsDashboardScreen = () => {
       </Row>
 
       {/* Direct KPIs */}
-      <SectionTitle><FaGlobe className="me-2" />Direct Traffic</SectionTitle>
+      <SectionTitle><FaGlobe className="me-2" />Direct Traffic {hasDateFilter && <small className="text-muted fw-normal">(filtered)</small>}</SectionTitle>
       <Row className="g-3 mb-4">
-        <Col xs={12} sm={6} xl={3}>
+        <Col xs={12} sm={6} xl={4}>
           <KpiCard
             icon={<FaMousePointer color="#fff" size={20} />}
             label="Direct Visits"
             value={direct.directVisits.toLocaleString()}
-            sub="without campaign link"
+            sub={hasDateFilter ? "in selected period" : "all time"}
             color="#20c997"
           />
         </Col>
-        <Col xs={12} sm={6} xl={3}>
+        <Col xs={12} sm={6} xl={4}>
           <KpiCard
             icon={<FaShoppingBag color="#fff" size={20} />}
             label="Direct Conversions"
             value={direct.directConversions.toLocaleString()}
-            sub="orders without campaign"
+            sub={hasDateFilter ? "in selected period" : "all time"}
             color="#198754"
           />
         </Col>
-        <Col xs={12} sm={6} xl={3}>
+        <Col xs={12} sm={6} xl={4}>
           <KpiCard
             icon={<FaEuroSign color="#fff" size={20} />}
             label="Direct Revenue"
             value={`€${direct.directRevenue.toLocaleString("en", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-            sub="without social media"
+            sub={hasDateFilter ? "in selected period" : "all time"}
             color="#0dcaf0"
+          />
+        </Col>
+      </Row>
+
+      {/* Total Summary */}
+      <SectionTitle><FaEuroSign className="me-2" />Total Summary</SectionTitle>
+      <Row className="g-3 mb-4">
+        <Col xs={12} sm={6} xl={3}>
+          <KpiCard
+            icon={<FaEuroSign color="#fff" size={20} />}
+            label="Total Revenue (Orders)"
+            value={`€${totalRevenue.toLocaleString("en", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+            sub={`${overall.totalOrders || 0} paid orders${hasDateFilter ? " in period" : " all time"}`}
+            color="#212529"
           />
         </Col>
         <Col xs={12} sm={6} xl={3}>
           <KpiCard
             icon={<FaEuroSign color="#fff" size={20} />}
-            label="Total Revenue"
-            value={`€${totalRevenue.toLocaleString("en", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-            sub={`${overall.totalOrders || totalConversions} total orders`}
-            color="#212529"
+            label="Campaign + Direct"
+            value={`€${(campaign.totalRevenue + direct.directRevenue).toLocaleString("en", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+            sub="attributed revenue"
+            color="#6c757d"
           />
         </Col>
       </Row>
@@ -336,7 +363,18 @@ const AnalyticsDashboardScreen = () => {
       {/* Campaign Table */}
       <Card className="border-0 shadow-sm">
         <Card.Body>
-          <Card.Title className="mb-3">Campaign Breakdown</Card.Title>
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <Card.Title className="mb-0">Campaign Breakdown</Card.Title>
+            <InputGroup style={{ width: 220 }}>
+              <InputGroup.Text><FaSearch size={12} /></InputGroup.Text>
+              <Form.Control
+                size="sm"
+                placeholder="Filter by platform, product, niche..."
+                value={tableFilter}
+                onChange={(e) => setTableFilter(e.target.value)}
+              />
+            </InputGroup>
+          </div>
           {campaigns.length === 0 ? (
             <div className="text-center py-5 text-muted">
               <FaBullhorn size={32} className="mb-3 opacity-25" />
@@ -359,10 +397,16 @@ const AnalyticsDashboardScreen = () => {
                 <th className="text-end">Cost</th>
                 <th className="text-center">ROI</th>
                 <th className="text-center">Conv. Rate</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
-              {campaigns.map((c) => {
+              {campaigns.filter(c =>
+                !tableFilter ||
+                c.source?.toLowerCase().includes(tableFilter.toLowerCase()) ||
+                c.product?.name?.toLowerCase().includes(tableFilter.toLowerCase()) ||
+                c.niche?.toLowerCase().includes(tableFilter.toLowerCase())
+              ).map((c) => {
                 const rate =
                   c.clicks > 0
                     ? ((c.conversions / c.clicks) * 100).toFixed(1)
@@ -424,6 +468,15 @@ const AnalyticsDashboardScreen = () => {
                       >
                         {rate}%
                       </Badge>
+                    </td>
+                    <td className="text-center">
+                      <Button
+                        variant="outline-danger"
+                        size="sm"
+                        onClick={() => handleDelete(c.campaignId)}
+                      >
+                        <FaTrash />
+                      </Button>
                     </td>
                   </tr>
                 );

@@ -61,6 +61,29 @@ const OrderScreen = () => {
   async function onApprove(data, actions) {
     try {
       await payOrder({ orderId, details: { id: data.orderID } }).unwrap();
+
+      // Register attribution only after payment is confirmed (order is now isPaid: true)
+      try {
+        const source = JSON.parse(sessionStorage.getItem("analyticsSource") || "{}");
+        if (source.type === "campaign" && source.campaignId) {
+          await fetch(`/api/analytics/${source.campaignId}/convert`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ orderId }),
+          });
+        } else {
+          await fetch("/api/analytics/direct-convert", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ orderId }),
+          });
+        }
+        sessionStorage.removeItem("analyticsSource");
+        sessionStorage.removeItem("analyticsTracked");
+      } catch (_) {}
+
       refetch();
       toast.success("Payment successful");
     } catch (err) {

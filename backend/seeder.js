@@ -8,6 +8,7 @@ import Product from "./models/ProductModel.js";
 import Order from "./models/OderModel.js";
 import Analytics from "./models/AnalyticsModel.js";
 import SiteMetrics from "./models/SiteMetricsModel.js";
+import DirectTrafficLog from "./models/DirectTrafficLogModel.js";
 import connectDB from "./config/db.js";
 
 dotenv.config();
@@ -329,8 +330,23 @@ const destroyData = async () => {
   }
 };
 
+const resetAnalytics = async () => {
+  try {
+    await Analytics.deleteMany();
+    await SiteMetrics.deleteMany();
+    await DirectTrafficLog.deleteMany();
+    console.log("Analytics Data Reset! (Users/Products/Orders untouched)".yellow.inverse);
+    process.exit();
+  } catch (error) {
+    console.error(`${error}`.red.inverse);
+    process.exit(1);
+  }
+};
+
 if (process.argv[2] === "-d") {
   destroyData();
+} else if (process.argv[2] === "-r") {
+  resetAnalytics();
 } else {
   importData();
 }

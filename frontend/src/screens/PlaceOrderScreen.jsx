@@ -35,32 +35,6 @@ const PlaceOrderScreen = () => {
         totalPrice: cart.totalPrice,
       }).unwrap();
 
-      // Attribution — atribuie comanda sursei corecte
-      try {
-        const source = JSON.parse(
-          sessionStorage.getItem("analyticsSource") || "{}"
-        );
-        const orderId = res._id;
-
-        if (source.type === "campaign" && source.campaignId) {
-          await fetch(`/api/analytics/${source.campaignId}/convert`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({ orderId }),
-          });
-        } else {
-          await fetch("/api/analytics/direct-convert", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({ orderId }),
-          });
-        }
-      } catch (_) {
-        // Attribution errors nu blochează comanda
-      }
-
       dispatch(clearCartItems());
       navigate(`/order/${res._id}`);
     } catch (error) {

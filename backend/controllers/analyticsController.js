@@ -2,6 +2,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import asyncHandler from "../middleware/asyncHandler.js";
 import Analytics from "../models/AnalyticsModel.js";
 import SiteMetrics from "../models/SiteMetricsModel.js";
+import DirectTrafficLog from "../models/DirectTrafficLogModel.js";
 import Order from "../models/OderModel.js";
 import { syncInstagramMetrics } from "../utils/instagramScraper.js";
 
@@ -33,11 +34,14 @@ const registerClick = asyncHandler(async (req, res) => {
 // @route   POST /api/analytics/direct-visit
 // @access  Public
 const registerDirectVisit = asyncHandler(async (req, res) => {
-  await SiteMetrics.findOneAndUpdate(
-    { _id: "global" },
-    { $inc: { directVisits: 1 } },
-    { upsert: true }
-  );
+  await Promise.all([
+    DirectTrafficLog.create({ type: "visit", revenue: 0 }),
+    SiteMetrics.findOneAndUpdate(
+      { _id: "global" },
+      { $inc: { directVisits: 1 } },
+      { upsert: true }
+    ),
+  ]);
   res.json({ message: "Direct visit registered" });
 });
 
@@ -46,7 +50,7 @@ const registerDirectVisit = asyncHandler(async (req, res) => {
 // @access  Private
 const registerConversion = asyncHandler(async (req, res) => {
   const { orderId } = req.body;
-  const order = await Order.findOne({ _id: orderId, user: req.user._id, isPaid: false });
+  const order = await Order.findOne({ _id: orderId, user: req.user._id, isPaid: true });
   if (!order) {
     res.status(404);
     throw new Error("Order not found or already attributed");
@@ -67,16 +71,19 @@ const registerConversion = asyncHandler(async (req, res) => {
 // @access  Private
 const registerDirectConversion = asyncHandler(async (req, res) => {
   const { orderId } = req.body;
-  const order = await Order.findOne({ _id: orderId, user: req.user._id, isPaid: false });
+  const order = await Order.findOne({ _id: orderId, user: req.user._id, isPaid: true });
   if (!order) {
     res.status(404);
     throw new Error("Order not found or already attributed");
   }
-  await SiteMetrics.findOneAndUpdate(
-    { _id: "global" },
-    { $inc: { directConversions: 1, directRevenue: order.totalPrice } },
-    { upsert: true }
-  );
+  await Promise.all([
+    DirectTrafficLog.create({ type: "conversion", revenue: order.totalPrice }),
+    SiteMetrics.findOneAndUpdate(
+      { _id: "global" },
+      { $inc: { directConversions: 1, directRevenue: order.totalPrice } },
+      { upsert: true }
+    ),
+  ]);
   res.json({ message: "Direct conversion registered" });
 });
 
@@ -97,6 +104,7 @@ const getAnalyticsSummary = asyncHandler(async (req, res) => {
     campaigns,
     siteMetricsDoc,
     [orderTotals],
+    [directLogTotals],
   ] = await Promise.all([
     Analytics.aggregate([
       { $match: dateFilter },
@@ -139,24 +147,40 @@ const getAnalyticsSummary = asyncHandler(async (req, res) => {
         },
       },
     ]),
+    DirectTrafficLog.aggregate([
+      { $match: dateFilter },
+      {
+        $group: {
+          _id: null,
+          directVisits: { $sum: { $cond: [{ $eq: ["$type", "visit"] }, 1, 0] } },
+          directConversions: { $sum: { $cond: [{ $eq: ["$type", "conversion"] }, 1, 0] } },
+          directRevenue: { $sum: "$revenue" },
+        },
+      },
+    ]),
   ]);
 
-  const siteMetrics = siteMetricsDoc || {
-    directVisits: 0,
-    directConversions: 0,
-    directRevenue: 0,
-  };
+  // DirectTrafficLog supports date filter; SiteMetrics is fallback for all-time when no filter
+  const hasDateFilter = !!(from && to);
+  const direct = hasDateFilter
+    ? {
+        directVisits: directLogTotals?.directVisits || 0,
+        directConversions: directLogTotals?.directConversions || 0,
+        directRevenue: directLogTotals?.directRevenue || 0,
+      }
+    : {
+        directVisits: siteMetricsDoc?.directVisits || 0,
+        directConversions: siteMetricsDoc?.directConversions || 0,
+        directRevenue: siteMetricsDoc?.directRevenue || 0,
+      };
 
   res.json({
-    campaign: campaignTotals || {
-      totalClicks: 0,
-      totalConversions: 0,
-      totalRevenue: 0,
-    },
-    direct: siteMetrics,
+    campaign: campaignTotals || { totalClicks: 0, totalConversions: 0, totalRevenue: 0 },
+    direct,
     overall: orderTotals || { totalRevenue: 0, totalOrders: 0 },
     byPlatform,
     campaigns,
+    hasDateFilter,
   });
 });
 
@@ -218,6 +242,18 @@ Return ONLY a valid JSON object with exactly these two fields (no markdown, no e
   res.json(content);
 });
 
+// @desc    Delete a campaign record
+// @route   DELETE /api/analytics/:campaignId
+// @access  Private/Admin
+const deleteCampaign = asyncHandler(async (req, res) => {
+  const record = await Analytics.findOneAndDelete({ campaignId: req.params.campaignId });
+  if (!record) {
+    res.status(404);
+    throw new Error("Campaign not found");
+  }
+  res.json({ message: "Campaign deleted" });
+});
+
 export {
   createSocialPostRecord,
   setPostId,
@@ -228,4 +264,5 @@ export {
   registerDirectConversion,
   getAnalyticsSummary,
   triggerInstagramSync,
+  deleteCampaign,
 };
