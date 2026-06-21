@@ -5,6 +5,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Header from "./Components/Header";
 import Footer from "./Components/Footer";
+import CookieConsent from "./Components/CookieConsent";
 
 const App = () => {
   useEffect(() => {
@@ -42,6 +43,7 @@ const App = () => {
       </main>
       <Footer />
       <ToastContainer />
+      <CookieConsent />
     </>
   );
 };

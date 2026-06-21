@@ -105,6 +105,8 @@ const getAnalyticsSummary = asyncHandler(async (req, res) => {
     siteMetricsDoc,
     [orderTotals],
     [directLogTotals],
+    dailyOrders,
+    dailyDirectVisits,
   ] = await Promise.all([
     Analytics.aggregate([
       { $match: dateFilter },
@@ -158,6 +160,28 @@ const getAnalyticsSummary = asyncHandler(async (req, res) => {
         },
       },
     ]),
+    Order.aggregate([
+      { $match: { ...orderDateFilter, isPaid: true } },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$paidAt" } },
+          revenue: { $sum: "$totalPrice" },
+          orders: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]),
+    DirectTrafficLog.aggregate([
+      { $match: dateFilter },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          visits: { $sum: { $cond: [{ $eq: ["$type", "visit"] }, 1, 0] } },
+          conversions: { $sum: { $cond: [{ $eq: ["$type", "conversion"] }, 1, 0] } },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]),
   ]);
 
   // DirectTrafficLog supports date filter; SiteMetrics is fallback for all-time when no filter
@@ -181,6 +205,8 @@ const getAnalyticsSummary = asyncHandler(async (req, res) => {
     byPlatform,
     campaigns,
     hasDateFilter,
+    dailyOrders,
+    dailyDirectVisits,
   });
 });
 

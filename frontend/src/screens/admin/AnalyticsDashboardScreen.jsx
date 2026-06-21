@@ -3,6 +3,8 @@ import { Row, Col, Card, Table, Badge, Button, Form, InputGroup } from "react-bo
 import {
   BarChart,
   Bar,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -23,6 +25,7 @@ import {
   FaBullhorn,
   FaTrash,
   FaSearch,
+  FaDownload,
 } from "react-icons/fa";
 import Loader from "../../Components/Loader";
 import Message from "../../Components/Message";
@@ -136,7 +139,37 @@ const AnalyticsDashboardScreen = () => {
       </Message>
     );
 
-  const { campaign, direct, overall, byPlatform, campaigns, hasDateFilter } = data;
+  const { campaign, direct, overall, byPlatform, campaigns, hasDateFilter, dailyOrders, dailyDirectVisits } = data;
+
+  const exportCSV = () => {
+    const headers = ["Platform","Product","Niche","Style","Views","Likes","Shares","Clicks","Conv.","Revenue (€)","Cost (€)","ROI (%)","Conv. Rate (%)"];
+    const rows = campaigns.map((c) => {
+      const roi = c.cost > 0 ? (((c.totalRevenue - c.cost) / c.cost) * 100).toFixed(0) : "";
+      const rate = c.clicks > 0 ? ((c.conversions / c.clicks) * 100).toFixed(1) : "0.0";
+      return [c.source, c.product?.name || "", c.niche || "", c.contentStyle || "",
+        c.views, c.likes, c.shares, c.clicks, c.conversions,
+        c.totalRevenue.toFixed(2), c.cost > 0 ? c.cost.toFixed(2) : "", roi, rate];
+    });
+    const csv = [headers, ...rows].map((r) => r.map((v) => `"${v}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `analytics-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // Merge daily orders + direct visits by date for timeline chart
+  const allDates = [...new Set([
+    ...(dailyOrders || []).map((d) => d._id),
+    ...(dailyDirectVisits || []).map((d) => d._id),
+  ])].sort();
+  const timelineData = allDates.map((date) => ({
+    date: date.slice(5), // MM-DD
+    Revenue: parseFloat(((dailyOrders || []).find((d) => d._id === date)?.revenue || 0).toFixed(2)),
+    Visits: (dailyDirectVisits || []).find((d) => d._id === date)?.visits || 0,
+  }));
 
   const campaignConvRate =
     campaign.totalClicks > 0
@@ -304,6 +337,27 @@ const AnalyticsDashboardScreen = () => {
         </Col>
       </Row>
 
+      {/* Timeline chart */}
+      {timelineData.length > 0 && (
+        <Card className="border-0 shadow-sm mb-4">
+          <Card.Body>
+            <Card.Title className="mb-3">Daily Revenue & Direct Visits</Card.Title>
+            <ResponsiveContainer width="100%" height={240}>
+              <LineChart data={timelineData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+                <YAxis yAxisId="rev" tickFormatter={(v) => `€${v}`} tick={{ fontSize: 12 }} />
+                <YAxis yAxisId="vis" orientation="right" tick={{ fontSize: 12 }} />
+                <Tooltip formatter={(value, name) => name === "Revenue" ? `€${value}` : value} />
+                <Legend />
+                <Line yAxisId="rev" type="monotone" dataKey="Revenue" stroke="#0d6efd" strokeWidth={2} dot={false} />
+                <Line yAxisId="vis" type="monotone" dataKey="Visits" stroke="#20c997" strokeWidth={2} dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          </Card.Body>
+        </Card>
+      )}
+
       {/* Charts row */}
       <Row className="g-3 mb-4">
         <Col md={8}>
@@ -365,7 +419,11 @@ const AnalyticsDashboardScreen = () => {
         <Card.Body>
           <div className="d-flex justify-content-between align-items-center mb-3">
             <Card.Title className="mb-0">Campaign Breakdown</Card.Title>
-            <InputGroup style={{ width: 220 }}>
+            <div className="d-flex gap-2 align-items-center">
+              <Button variant="outline-success" size="sm" onClick={exportCSV} disabled={campaigns.length === 0}>
+                <FaDownload className="me-1" /> Export CSV
+              </Button>
+              <InputGroup style={{ width: 220 }}>
               <InputGroup.Text><FaSearch size={12} /></InputGroup.Text>
               <Form.Control
                 size="sm"
@@ -374,6 +432,7 @@ const AnalyticsDashboardScreen = () => {
                 onChange={(e) => setTableFilter(e.target.value)}
               />
             </InputGroup>
+            </div>
           </div>
           {campaigns.length === 0 ? (
             <div className="text-center py-5 text-muted">

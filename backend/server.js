@@ -35,6 +35,7 @@ app.use(
           "'self'",
           "https://www.paypal.com",
           "https://*.paypal.com",
+          "https://www.google.com",
         ],
         imgSrc: [
           "'self'",
