@@ -20,7 +20,39 @@ connectDB(); //connect to MongoDB
 
 const app = express();
 
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: [
+          "'self'",
+          "https://www.paypal.com",
+          "https://*.paypal.com",
+          "https://*.paypalobjects.com",
+        ],
+        frameSrc: [
+          "'self'",
+          "https://www.paypal.com",
+          "https://*.paypal.com",
+        ],
+        imgSrc: [
+          "'self'",
+          "data:",
+          "blob:",
+          "https://*.paypal.com",
+          "https://*.paypalobjects.com",
+        ],
+        connectSrc: [
+          "'self'",
+          "https://api.paypal.com",
+          "https://*.paypal.com",
+        ],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+      },
+    },
+  })
+);
 app.use(compression());
 
 const authLimiter = rateLimit({
