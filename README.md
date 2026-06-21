@@ -1,13 +1,5 @@
 # Platformă Integrată de Marketing Digital și Analiză a Performanței Campaniilor Social Media pentru Branduri de Modă
 
-**Academia de Studii Economice din București**
-**Facultatea de Cibernetică, Statistică și Informatică Economică**
-**Master SIMPRE**
-
-**Student:** Cernica Sergiu-Rareș
-**Coordonator:** [Numele coordonatorului]
-**Sesiunea:** Iulie 2026
-
 ---
 
 > Acest document reprezintă **cuprinsul orientativ și schița de conținut** al lucrării de disertație.
@@ -18,8 +10,7 @@
 ## Resurse proiect
 
 - **Aplicație:** https://thenecessaryproject.onrender.com/
-- **Repository GitHub:** https://github.com/[username]/TheNecessaryProject
-- **Demo video:** [link demo]
+- **Repository GitHub:** https://github.com/Jghaba/TheNecessaryProject
 
 ---
 

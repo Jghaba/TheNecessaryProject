@@ -15,7 +15,16 @@ const getProducts = asyncHandler(async (req, res) => {
 
   const count = await Product.countDocuments({ ...keyword });
 
+  const sortMap = {
+    price_asc: { price: 1 },
+    price_desc: { price: -1 },
+    rating: { rating: -1 },
+    newest: { createdAt: -1 },
+  };
+  const sortObj = sortMap[req.query.sort] || { createdAt: -1 };
+
   const products = await Product.find({ ...keyword })
+    .sort(sortObj)
     .limit(pageSize)
     .skip(pageSize * (page - 1));
   res.json({ products, page, pages: Math.ceil(count / pageSize) });

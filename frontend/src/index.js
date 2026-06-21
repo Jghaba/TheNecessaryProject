@@ -34,6 +34,8 @@ import UserEditScreen from "./screens/admin/UserEditScreen";
 import AnalyticsDashboardScreen from "./screens/admin/AnalyticsDashboardScreen";
 import CreateCampaignScreen from "./screens/admin/CreateCampaignScreen";
 import Contact from "./Components/Contact";
+import NotFoundScreen from "./screens/NotFoundScreen";
+import WishlistScreen from "./screens/WishlistScreen";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -57,6 +59,7 @@ const router = createBrowserRouter(
         <Route path="/placeorder" element={<PlaceOrderScreen />} />
         <Route path="/order/:id" element={<OrderScreen />} />
         <Route path="/profile" element={<ProfileScreen />} />
+        <Route path="/wishlist" element={<WishlistScreen />} />
       </Route>
 
       <Route path="" element={<AdminRoute />}>
@@ -80,6 +83,7 @@ const router = createBrowserRouter(
         <Route path="/admin/analytics" element={<AnalyticsDashboardScreen />} />
         <Route path="/admin/campaign/create" element={<CreateCampaignScreen />} />
       </Route>
+      <Route path="*" element={<NotFoundScreen />} />
     </Route>
   )
 );

@@ -190,6 +190,30 @@ const updateUser = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc    Toggle wishlist item (add if absent, remove if present)
+// @route   PUT /api/users/wishlist/:productId
+// @access  Private
+const toggleWishlist = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  const productId = req.params.productId;
+  const idx = user.wishlist.findIndex((id) => id.toString() === productId);
+  if (idx === -1) {
+    user.wishlist.push(productId);
+  } else {
+    user.wishlist.splice(idx, 1);
+  }
+  await user.save();
+  res.json({ wishlist: user.wishlist });
+});
+
+// @desc    Get wishlist product IDs
+// @route   GET /api/users/wishlist
+// @access  Private
+const getWishlist = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id).populate("wishlist", "_id name price image rating");
+  res.json(user.wishlist);
+});
+
 export {
   loginUser,
   registerUser,
@@ -200,4 +224,6 @@ export {
   deleteUser,
   getUserByID,
   updateUser,
+  toggleWishlist,
+  getWishlist,
 };

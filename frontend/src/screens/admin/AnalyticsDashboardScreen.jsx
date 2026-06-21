@@ -124,7 +124,14 @@ const AnalyticsDashboardScreen = () => {
   const handleSync = async () => {
     try {
       const result = await triggerSync().unwrap();
-      toast.success(`Sync complete — ${result.updated} campaigns updated`);
+      if (result.updated > 0) {
+        toast.success(`Sync complete — ${result.updated} campaign(s) updated`);
+      } else {
+        toast.warning(
+          `Sync: 0 matches. Instagram returned ${result.total} posts. DB has ${result.dbPostIds?.length || 0} linked post(s): [${result.dbPostIds?.join(", ") || "none"}]. Instagram shortcodes: [${result.instagramShortcodes?.slice(0, 5).join(", ") || "none"}${result.instagramShortcodes?.length > 5 ? "..." : ""}]`,
+          { autoClose: 10000 }
+        );
+      }
       refetch();
     } catch (err) {
       toast.error(err?.data?.message || "Sync failed");
@@ -189,6 +196,16 @@ const AnalyticsDashboardScreen = () => {
     { name: "Campaign", value: parseFloat(campaign.totalRevenue.toFixed(2)), color: "#0d6efd" },
     { name: "Direct", value: parseFloat(direct.directRevenue.toFixed(2)), color: "#198754" },
   ];
+
+  const roiData = campaigns
+    .filter((c) => (c.cost || 0) > 0)
+    .map((c) => ({
+      name: c.product?.name || c.source || c._id?.slice(-6),
+      ROI: parseFloat((((c.totalRevenue - c.cost) / c.cost) * 100).toFixed(1)),
+      Revenue: parseFloat((c.totalRevenue || 0).toFixed(2)),
+    }))
+    .sort((a, b) => b.ROI - a.ROI)
+    .slice(0, 8);
 
   return (
     <>
@@ -317,7 +334,7 @@ const AnalyticsDashboardScreen = () => {
       {/* Total Summary */}
       <SectionTitle><FaEuroSign className="me-2" />Total Summary</SectionTitle>
       <Row className="g-3 mb-4">
-        <Col xs={12} sm={6} xl={3}>
+        <Col xs={12} sm={6} xl={4}>
           <KpiCard
             icon={<FaEuroSign color="#fff" size={20} />}
             label="Total Revenue (Orders)"
@@ -326,16 +343,56 @@ const AnalyticsDashboardScreen = () => {
             color="#212529"
           />
         </Col>
-        <Col xs={12} sm={6} xl={3}>
+        <Col xs={12} sm={6} xl={4}>
           <KpiCard
             icon={<FaEuroSign color="#fff" size={20} />}
-            label="Campaign + Direct"
+            label="Attributed Revenue"
             value={`€${(campaign.totalRevenue + direct.directRevenue).toLocaleString("en", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-            sub="attributed revenue"
+            sub="campaign + direct"
             color="#6c757d"
           />
         </Col>
+        <Col xs={12} sm={6} xl={4}>
+          <KpiCard
+            icon={<FaShoppingBag color="#fff" size={20} />}
+            label="Total Conversions"
+            value={(campaign.totalConversions + direct.directConversions).toLocaleString()}
+            sub="campaign + direct orders"
+            color="#495057"
+          />
+        </Col>
       </Row>
+
+      {/* Funnel */}
+      <SectionTitle>Conversion Funnel</SectionTitle>
+      <Card className="border-0 shadow-sm mb-4">
+        <Card.Body>
+          <Row className="text-center g-0">
+            {[
+              { label: "Direct Visits", value: direct.directVisits, color: "#20c997" },
+              { label: "Campaign Clicks", value: campaign.totalClicks, color: "#0d6efd" },
+              { label: "Conversions", value: campaign.totalConversions + direct.directConversions, color: "#198754" },
+            ].map((step, i, arr) => (
+              <Col key={step.label} className="d-flex align-items-center">
+                <div className="flex-grow-1">
+                  <div style={{ fontSize: "2rem", fontWeight: 700, color: step.color }}>
+                    {step.value.toLocaleString()}
+                  </div>
+                  <div className="text-muted small">{step.label}</div>
+                  {i > 0 && arr[i - 1].value > 0 && (
+                    <div style={{ fontSize: "0.7rem", color: "#adb5bd" }}>
+                      {((step.value / arr[i - 1].value) * 100).toFixed(1)}% of prev. step
+                    </div>
+                  )}
+                </div>
+                {i < arr.length - 1 && (
+                  <div className="text-muted px-2" style={{ fontSize: "1.5rem" }}>›</div>
+                )}
+              </Col>
+            ))}
+          </Row>
+        </Card.Body>
+      </Card>
 
       {/* Timeline chart */}
       {timelineData.length > 0 && (
@@ -414,6 +471,28 @@ const AnalyticsDashboardScreen = () => {
         </Col>
       </Row>
 
+      {/* ROI Chart */}
+      {roiData.length > 0 && (
+        <Card className="border-0 shadow-sm mb-4">
+          <Card.Body>
+            <Card.Title className="mb-3">ROI by Campaign (%)</Card.Title>
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={roiData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }} layout="vertical">
+                <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                <XAxis type="number" tickFormatter={(v) => `${v}%`} tick={{ fontSize: 12 }} />
+                <YAxis type="category" dataKey="name" width={90} tick={{ fontSize: 12 }} />
+                <Tooltip formatter={(value, name) => name === "ROI" ? `${value}%` : `€${value}`} />
+                <Bar dataKey="ROI" radius={[0, 6, 6, 0]}>
+                  {roiData.map((entry, i) => (
+                    <Cell key={i} fill={entry.ROI >= 0 ? "#198754" : "#dc3545"} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </Card.Body>
+        </Card>
+      )}
+
       {/* Campaign Table */}
       <Card className="border-0 shadow-sm">
         <Card.Body>
@@ -447,6 +526,7 @@ const AnalyticsDashboardScreen = () => {
                 <th>Product</th>
                 <th>Niche</th>
                 <th>Style</th>
+                <th className="text-center">Post ID</th>
                 <th className="text-center">Views</th>
                 <th className="text-center">Likes</th>
                 <th className="text-center">Shares</th>
@@ -495,6 +575,11 @@ const AnalyticsDashboardScreen = () => {
                     </td>
                     <td className="text-muted small">{c.niche}</td>
                     <td className="text-muted small">{c.contentStyle}</td>
+                    <td className="text-center">
+                      {c.postId
+                        ? <span title={`postId: ${c.postId}`} style={{ color: "#C13584", fontSize: "0.7rem" }}>✓ {c.postId.slice(0,8)}…</span>
+                        : <span className="text-muted small">—</span>}
+                    </td>
                     <td className="text-center text-muted">{c.views.toLocaleString()}</td>
                     <td className="text-center text-muted">{c.likes.toLocaleString()}</td>
                     <td className="text-center text-muted">{c.shares.toLocaleString()}</td>

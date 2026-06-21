@@ -9,13 +9,20 @@ function extractShortcode(permalink) {
 
 async function fetchInstagramMedia() {
   const { INSTAGRAM_BUSINESS_ACCOUNT_ID, INSTAGRAM_ACCESS_TOKEN } = process.env;
-  const url = `${BASE_URL}/${INSTAGRAM_BUSINESS_ACCOUNT_ID}/media?fields=id,media_type,timestamp,permalink&access_token=${INSTAGRAM_ACCESS_TOKEN}`;
+  // Include like_count and comments_count as basic fields — no insights permission needed
+  let url = `${BASE_URL}/${INSTAGRAM_BUSINESS_ACCOUNT_ID}/media?fields=id,media_type,timestamp,permalink,like_count,comments_count&limit=100&access_token=${INSTAGRAM_ACCESS_TOKEN}`;
 
-  const response = await fetch(url);
-  const data = await response.json();
+  const allMedia = [];
 
-  if (data.error) throw new Error(`Instagram API: ${data.error.message}`);
-  return data.data || [];
+  while (url) {
+    const response = await fetch(url);
+    const data = await response.json();
+    if (data.error) throw new Error(`Instagram API: ${data.error.message}`);
+    allMedia.push(...(data.data || []));
+    url = data.paging?.next || null;
+  }
+
+  return allMedia;
 }
 
 async function fetchMediaInsights(mediaId, mediaType) {
@@ -23,14 +30,17 @@ async function fetchMediaInsights(mediaId, mediaType) {
 
   const metrics =
     mediaType === "VIDEO"
-      ? "video_views,reach,likes,comments,shares,saved"
-      : "impressions,reach,likes,comments,shares,saved";
+      ? "views,reach,saved,shares,likes,comments"
+      : "impressions,reach,saved,likes,comments,shares";
 
   const url = `${BASE_URL}/${mediaId}/insights?metric=${metrics}&access_token=${INSTAGRAM_ACCESS_TOKEN}`;
   const response = await fetch(url);
   const data = await response.json();
 
-  if (data.error) return null;
+  if (data.error) {
+    console.log(`[Instagram Scraper] Insights error for ${mediaId}: ${data.error.message}`);
+    return null;
+  }
 
   const result = {};
   data.data?.forEach((metric) => {
@@ -43,31 +53,45 @@ export async function syncInstagramMetrics() {
   console.log("[Instagram Scraper] Starting sync...");
 
   const mediaList = await fetchInstagramMedia();
+  console.log(`[Instagram Scraper] Fetched ${mediaList.length} posts from Instagram`);
+
+  const instagramShortcodes = mediaList.map((m) => extractShortcode(m.permalink)).filter(Boolean);
+  console.log("[Instagram Scraper] Shortcodes from API:", instagramShortcodes);
+
+  const dbPostIds = (await Analytics.find({ postId: { $ne: null, $ne: "" } }, "postId")).map((a) => a.postId);
+  console.log("[Instagram Scraper] PostIds in DB:", dbPostIds);
+
   let updated = 0;
   let notFound = 0;
 
   for (const media of mediaList) {
-    const insights = await fetchMediaInsights(media.id, media.media_type);
-    if (!insights) continue;
-
     const shortcode = extractShortcode(media.permalink);
+    if (!shortcode) continue;
+
+    // Try insights for richer metrics; fall back to basic fields if unavailable
+    const insights = await fetchMediaInsights(media.id, media.media_type);
+
+    const updateData = {
+      likes: insights?.likes ?? media.like_count ?? 0,
+      commentCount: insights?.comments ?? media.comments_count ?? 0,
+      views: insights?.views ?? insights?.impressions ?? 0,
+      shares: insights?.shares ?? 0,
+      saved: insights?.saved ?? 0,
+    };
+
     const result = await Analytics.findOneAndUpdate(
       { postId: shortcode },
-      {
-        views: insights.video_views ?? insights.impressions ?? 0,
-        likes: insights.likes ?? 0,
-        commentCount: insights.comments ?? 0,
-        shares: insights.shares ?? 0,
-        saved: insights.saved ?? 0,
-      },
+      updateData,
       { new: true }
     );
 
-    result ? updated++ : notFound++;
+    if (result) {
+      updated++;
+    } else {
+      notFound++;
+    }
   }
 
-  console.log(
-    `[Instagram Scraper] Done. Updated: ${updated}, No matching campaign: ${notFound}`
-  );
-  return { updated, notFound, total: mediaList.length };
+  console.log(`[Instagram Scraper] Done. Updated: ${updated}, No match: ${notFound}, Total: ${mediaList.length}`);
+  return { updated, notFound, total: mediaList.length, dbPostIds, instagramShortcodes };
 }

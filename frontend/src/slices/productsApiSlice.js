@@ -4,12 +4,13 @@ import { apiSlice } from "./apiSlice";
 export const productsApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getProducts: builder.query({
-      query: ({ keyword, pageNumber, pageSize }) => ({
+      query: ({ keyword, pageNumber, pageSize, sort } = {}) => ({
         url: PRODUCTS_URL,
         params: {
           keyword,
           pageNumber,
           ...(pageSize && { pageSize }),
+          ...(sort && { sort }),
         },
       }),
       providesTags: ["Products"],
@@ -64,6 +65,15 @@ export const productsApiSlice = apiSlice.injectEndpoints({
       }),
       keepUnusedDataFor: 5,
     }),
+    getRelatedProducts: builder.query({
+      query: (excludeId) => ({
+        url: PRODUCTS_URL,
+        params: { pageSize: 5, sort: "rating" },
+      }),
+      transformResponse: (response, meta, excludeId) =>
+        response.products.filter((p) => p._id !== excludeId).slice(0, 4),
+      keepUnusedDataFor: 60,
+    }),
   }),
 });
 
@@ -76,4 +86,5 @@ export const {
   useDeleteProductMutation,
   useCreateReviewMutation,
   useGetTopProductsQuery,
+  useGetRelatedProductsQuery,
 } = productsApiSlice;

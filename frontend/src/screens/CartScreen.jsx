@@ -1,36 +1,23 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  Row,
-  Col,
-  ListGroup,
-  Image,
-  Form,
-  Button,
-  Card,
-} from "react-bootstrap";
-import { FaTrash } from "react-icons/fa";
+import { Row, Col, ListGroup, Image, Button, Card } from "react-bootstrap";
+import { FaTrash, FaPlus, FaMinus } from "react-icons/fa";
 import Message from "../Components/Message";
 import { addToCart, removeFromCart } from "../slices/cartSlice";
 
 const CartScreen = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { cartItems } = useSelector((state) => state.cart);
 
-  const cart = useSelector((state) => state.cart);
-  const { cartItems } = cart;
-
-  const addToCartHandler = async (product, qty) => {
-    dispatch(addToCart({ ...product, qty }));
+  const updateQty = (item, delta) => {
+    const newQty = item.qty + delta;
+    if (newQty < 1 || newQty > item.countInStock) return;
+    dispatch(addToCart({ ...item, qty: newQty }));
   };
 
-  const removeFromCartHandler = async (id) => {
-    dispatch(removeFromCart(id));
-  };
+  const checkoutHandler = () => navigate("/login?redirect=/shipping");
 
-  const checkoutHandler = () => {
-    navigate("/login?redirect=/shipping");
-  };
   return (
     <Row>
       <Col md={8}>
@@ -43,34 +30,44 @@ const CartScreen = () => {
           <ListGroup variant="flush">
             {cartItems.map((item) => (
               <ListGroup.Item key={item._id}>
-                <Row>
+                <Row className="align-items-center">
                   <Col md={2}>
                     <Image src={item.image} alt={item.name} fluid rounded />
                   </Col>
                   <Col md={3}>
-                    <Link to={`/product/${item._id}`}> {item.name}</Link>
+                    <Link to={`/product/${item._id}`}>{item.name}</Link>
                   </Col>
-                  <Col md={2}>${item.price}</Col>
-                  <Col md={2}>
-                    <Form.Control
-                      as="select"
-                      value={item.qty}
-                      onChange={(e) => {
-                        addToCartHandler(item, Number(e.target.value));
-                      }}
-                    >
-                      {[...Array(item.countInStock).keys()].map((x) => (
-                        <option key={x + 1} value={x + 1}>
-                          {x + 1}
-                        </option>
-                      ))}
-                    </Form.Control>
+                  <Col md={2} className="fw-bold">€{item.price}</Col>
+                  <Col md={3}>
+                    <div className="d-flex align-items-center gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline-secondary"
+                        onClick={() => updateQty(item, -1)}
+                        disabled={item.qty <= 1}
+                        style={{ width: 30, height: 30, padding: 0 }}
+                      >
+                        <FaMinus size={10} />
+                      </Button>
+                      <span style={{ minWidth: 20, textAlign: "center", fontWeight: 600 }}>
+                        {item.qty}
+                      </span>
+                      <Button
+                        size="sm"
+                        variant="outline-secondary"
+                        onClick={() => updateQty(item, 1)}
+                        disabled={item.qty >= item.countInStock}
+                        style={{ width: 30, height: 30, padding: 0 }}
+                      >
+                        <FaPlus size={10} />
+                      </Button>
+                    </div>
                   </Col>
-                  <Col md={2}>
+                  <Col md={1}>
                     <Button
                       type="button"
                       variant="light"
-                      onClick={() => removeFromCartHandler(item._id)}
+                      onClick={() => dispatch(removeFromCart(item._id))}
                     >
                       <FaTrash />
                     </Button>
@@ -86,18 +83,16 @@ const CartScreen = () => {
           <ListGroup variant="flush">
             <ListGroup.Item>
               <h2>
-                Subtotal ({cartItems.reduce((acc, item) => acc + item.qty, 0)})
-                items
+                Subtotal ({cartItems.reduce((acc, item) => acc + item.qty, 0)}) items
               </h2>
-              $
-              {cartItems
-                .reduce((acc, item) => acc + item.qty * item.price, 0)
-                .toFixed(2)}
+              <span className="fw-bold fs-5">
+                €{cartItems.reduce((acc, item) => acc + item.qty * item.price, 0).toFixed(2)}
+              </span>
             </ListGroup.Item>
             <ListGroup.Item>
               <Button
                 type="button"
-                className="btn-block"
+                className="btn-block w-100"
                 disabled={cartItems.length === 0}
                 onClick={checkoutHandler}
               >
@@ -110,4 +105,5 @@ const CartScreen = () => {
     </Row>
   );
 };
+
 export default CartScreen;

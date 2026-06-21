@@ -3,6 +3,7 @@ import Order from "../models/OderModel.js";
 import Product from "../models/ProductModel.js";
 import { calcPrices } from "../utils/calcPrices.js";
 import { checkIfNewTransaction, capturePayPalOrder } from "../utils/paypal.js";
+import sendOrderConfirmationEmail from "../utils/sendEmail.js";
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -115,6 +116,13 @@ const updateOrderToPaid = asyncHandler(async (req, res) => {
     };
 
     const updatedOrder = await order.save();
+
+    // Send confirmation email (non-blocking)
+    try {
+      const populated = await Order.findById(order._id).populate("user", "name email");
+      await sendOrderConfirmationEmail(populated);
+    } catch (_) {}
+
     res.json(updatedOrder);
   } else {
     res.status(404);

@@ -27,14 +27,13 @@ app.use(
         defaultSrc: ["'self'"],
         scriptSrc: [
           "'self'",
-          "https://www.paypal.com",
           "https://*.paypal.com",
           "https://*.paypalobjects.com",
         ],
         frameSrc: [
           "'self'",
-          "https://www.paypal.com",
           "https://*.paypal.com",
+          "https://*.paypalobjects.com",
           "https://www.google.com",
         ],
         imgSrc: [
@@ -46,10 +45,12 @@ app.use(
         ],
         connectSrc: [
           "'self'",
-          "https://api.paypal.com",
           "https://*.paypal.com",
+          "https://*.paypalobjects.com",
         ],
-        styleSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://*.paypalobjects.com"],
+        fontSrc: ["'self'", "https://*.paypalobjects.com"],
+        formAction: ["'self'", "https://*.paypal.com"],
       },
     },
   })
