@@ -1,6 +1,6 @@
 // error handler to map possible errors to statusCode and message + stackTrace --> check Postman for execution example
 const notFound = (req, res, next) => {
-  const error = new Error(`Not Found - ${req.originalURL}`);
+  const error = new Error(`Not Found - ${req.originalUrl}`);
   res.status(404);
   next(error);
 };

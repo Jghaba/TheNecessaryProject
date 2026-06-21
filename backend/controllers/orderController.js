@@ -21,30 +21,24 @@ const addOrderItems = asyncHandler(async (req, res) => {
       _id: { $in: orderItems.map((x) => x._id) },
     });
 
-    const dbOrderItems = orderItems.map((itemFromClient) => {
+    const dbOrderItems = [];
+    for (const itemFromClient of orderItems) {
       const matchingItemFromDB = itemsFromDB.find(
         (itemFromDB) => itemFromDB._id.toString() === itemFromClient._id
       );
-      // Calculate stock
-      const remainingStock =
-        matchingItemFromDB.countInStock - itemFromClient.qty;
+      const remainingStock = matchingItemFromDB.countInStock - itemFromClient.qty;
       if (remainingStock < 0) {
-        throw new Error(
-          `Insufficient stock for item ${matchingItemFromDB.name}`
-        );
+        throw new Error(`Insufficient stock for item ${matchingItemFromDB.name}`);
       }
-
-      // Update item stock
       matchingItemFromDB.countInStock = remainingStock;
-      matchingItemFromDB.save();
-
-      return {
+      await matchingItemFromDB.save();
+      dbOrderItems.push({
         ...itemFromClient,
         product: itemFromClient._id,
         price: matchingItemFromDB.price,
         _id: undefined,
-      };
-    });
+      });
+    }
 
     // Calculate prices
     const { itemsPrice, taxPrice, shippingPrice, totalPrice } =
@@ -142,7 +136,7 @@ const updateOrderToDelivered = asyncHandler(async (req, res) => {
     res.json(updatedOrder);
   } else {
     res.status(404);
-    throw new error("Order not found!");
+    throw new Error("Order not found!");
   }
 });
 

@@ -45,14 +45,19 @@ const registerDirectVisit = asyncHandler(async (req, res) => {
 // @route   PUT /api/analytics/:campaignId/convert
 // @access  Private
 const registerConversion = asyncHandler(async (req, res) => {
-  const { revenue } = req.body;
+  const { orderId } = req.body;
+  const order = await Order.findOne({ _id: orderId, user: req.user._id, isPaid: false });
+  if (!order) {
+    res.status(404);
+    throw new Error("Order not found or already attributed");
+  }
   const record = await Analytics.findOne({ campaignId: req.params.campaignId });
   if (!record) {
     res.status(404);
     throw new Error("Campaign not found");
   }
   record.conversions += 1;
-  record.totalRevenue += Number(revenue) || 0;
+  record.totalRevenue += order.totalPrice;
   await record.save();
   res.json({ message: "Conversion registered", record });
 });
@@ -61,10 +66,15 @@ const registerConversion = asyncHandler(async (req, res) => {
 // @route   POST /api/analytics/direct-convert
 // @access  Private
 const registerDirectConversion = asyncHandler(async (req, res) => {
-  const { revenue } = req.body;
+  const { orderId } = req.body;
+  const order = await Order.findOne({ _id: orderId, user: req.user._id, isPaid: false });
+  if (!order) {
+    res.status(404);
+    throw new Error("Order not found or already attributed");
+  }
   await SiteMetrics.findOneAndUpdate(
     { _id: "global" },
-    { $inc: { directConversions: 1, directRevenue: Number(revenue) || 0 } },
+    { $inc: { directConversions: 1, directRevenue: order.totalPrice } },
     { upsert: true }
   );
   res.json({ message: "Direct conversion registered" });
