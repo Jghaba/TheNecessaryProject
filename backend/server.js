@@ -27,6 +27,7 @@ app.use(
         defaultSrc: ["'self'"],
         scriptSrc: [
           "'self'",
+          "'unsafe-inline'",
           "https://*.paypal.com",
           "https://*.paypalobjects.com",
         ],
@@ -42,15 +43,20 @@ app.use(
           "blob:",
           "https://*.paypal.com",
           "https://*.paypalobjects.com",
+          "https://*.braintreegateway.com",
         ],
         connectSrc: [
           "'self'",
           "https://*.paypal.com",
           "https://*.paypalobjects.com",
+          "https://*.braintree-api.com",
+          "https://*.braintreegateway.com",
         ],
         styleSrc: ["'self'", "'unsafe-inline'", "https://*.paypalobjects.com"],
         fontSrc: ["'self'", "https://*.paypalobjects.com"],
         formAction: ["'self'", "https://*.paypal.com"],
+        workerSrc: ["'self'", "blob:"],
+        childSrc: ["'self'", "blob:", "https://*.paypal.com"],
       },
     },
   })

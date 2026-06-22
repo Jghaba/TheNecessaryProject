@@ -22,6 +22,19 @@ const PLATFORMS = [
   { value: "Facebook", icon: <FaFacebook />, color: "#1877F2" },
 ];
 
+const NICHES = [
+  "Streetwear",
+  "Minimalist Fashion",
+  "Gym & Athleisure",
+  "Luxury Casual",
+  "Urban Explorer",
+  "Vintage & Retro",
+  "Smart Casual",
+  "Outdoor & Adventure",
+  "Festival Fashion",
+  "Business Casual",
+];
+
 const STYLES = ["Lifestyle", "Product Showcase", "Behind the Scenes", "Unboxing", "Street Style"];
 
 const CopyButton = ({ text }) => {
@@ -41,7 +54,7 @@ const CopyButton = ({ text }) => {
 
 const CreateCampaignScreen = () => {
   const [platform, setPlatform] = useState("Instagram");
-  const [niche, setNiche] = useState("");
+  const [niche, setNiche] = useState(NICHES[0]);
   const [contentStyle, setContentStyle] = useState("Lifestyle");
   const [selectedProduct, setSelectedProduct] = useState("");
   const [generated, setGenerated] = useState(null);
@@ -68,7 +81,6 @@ const CreateCampaignScreen = () => {
 
   const handleGenerate = async () => {
     if (!selectedProduct) return toast.error("Select a product");
-    if (!niche.trim()) return toast.error("Enter a niche");
 
     try {
       const result = await generateContent({
@@ -192,12 +204,14 @@ const CreateCampaignScreen = () => {
               {/* Niche */}
               <Form.Group className="mb-3">
                 <Form.Label className="fw-medium">Niche</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="e.g. streetwear, minimalist fashion, gym wear..."
+                <Form.Select
                   value={niche}
                   onChange={(e) => setNiche(e.target.value)}
-                />
+                >
+                  {NICHES.map((n) => (
+                    <option key={n} value={n}>{n}</option>
+                  ))}
+                </Form.Select>
               </Form.Group>
 
               {/* Estimated Cost */}
