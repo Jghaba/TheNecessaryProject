@@ -242,29 +242,57 @@ const setPostId = asyncHandler(async (req, res) => {
 // @desc    Generate AI caption + Kling prompt for a campaign
 // @route   POST /api/analytics/generate
 // @access  Private/Admin
+const PLATFORM_CAPTION_RULES = {
+  Instagram: "2-3 punchy sentences + line break + 5-8 hashtags. Total under 200 characters of body text (hashtags separate). Emotional, aspirational tone.",
+  TikTok: "1 hook sentence (max 8 words, creates curiosity) + 1-2 lines + 3-5 trending hashtags. Total under 150 characters. Gen-Z tone, energetic.",
+  Facebook: "2-3 sentences with a story angle + clear CTA at the end + 1-2 hashtags. Conversational, slightly longer than Instagram.",
+  YouTube: "Descriptive title-style opening sentence + 2-3 lines of context + no hashtags. SEO-friendly, keyword-rich.",
+};
+
 const generateCampaignContent = asyncHandler(async (req, res) => {
   const { productName, productPrice, platform, niche, contentStyle } = req.body;
 
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
   const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-  const prompt = `You are a social media marketing expert for "TheNecessary", a premium streetwear clothing brand. Generate content for a social media campaign.
+  const captionRules = PLATFORM_CAPTION_RULES[platform] || "Engaging, on-brand, max 200 characters + hashtags.";
 
-Platform: ${platform}
-Product: ${productName} (€${productPrice})
-Niche: ${niche}
-Content Style: ${contentStyle}
+  const prompt = `You are a social media marketing expert for "TheNecessary", a premium Romanian men's streetwear brand targeting 18-35 urban males.
 
-Return ONLY a valid JSON object with exactly these two fields (no markdown, no explanation, no code blocks):
+Campaign inputs:
+- Platform: ${platform}
+- Product: ${productName} (€${productPrice})
+- Niche: ${niche}
+- Content style: ${contentStyle}
+
+Generate two outputs:
+
+1. CAPTION — ${captionRules}
+
+2. VIDEO PROMPT — A Runway ML Gen-4 cinematic prompt. Rules:
+   - HARD LIMIT: under 900 characters total
+   - Format: [scene + model description]. [lighting]. Sequence: [shot 1] → [shot 2] → [close-up detail shot]. [mood/aesthetic keywords].
+   - Use technical camera terms: rack focus, tracking shot, slow zoom, shallow DOF
+   - Separate camera moves with →
+   - End with 3-5 aesthetic keywords (e.g. "film grain, 4K, editorial fashion")
+   - NO redundant adjectives, NO long sentences — keep it punchy and visual
+
+Return ONLY a valid JSON object, no markdown, no explanation:
 {
-  "caption": "engaging caption with relevant hashtags, adapted to platform tone, max 250 words",
-  "videoPrompt": "detailed Runway ML video generation prompt to animate the product image: describe movement, lighting, camera angles, mood, background, style — be cinematic and specific"
+  "caption": "...",
+  "videoPrompt": "..."
 }`;
 
   const result = await model.generateContent(prompt);
   const raw = result.response.text().trim();
   const cleaned = raw.replace(/^```json\n?/, "").replace(/\n?```$/, "");
   const content = JSON.parse(cleaned);
+
+  // Enforce 900 char hard limit on videoPrompt
+  if (content.videoPrompt && content.videoPrompt.length > 900) {
+    content.videoPrompt = content.videoPrompt.slice(0, 897) + "...";
+  }
+
   res.json(content);
 });
 
